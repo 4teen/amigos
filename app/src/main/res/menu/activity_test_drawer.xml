@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Cliques">
+    <menu>
+        <item
+            android:icon="@android:drawable/ic_input_add"
+            android:title="Add to clique" />
+        <item
+            android:icon="@android:drawable/ic_delete"
+            android:title="delete friend" />
+    </menu>
+</item>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:icon="@android:drawable/ic_menu_send"
+            android:title="message" />
+            <item
+                android:icon="@drawable/ic_mail"
+                android:title="email" />
+        </menu>
+    </item>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:icon="@android:drawable/ic_menu_gallery"
+            android:title="Gallery" />
+        <item
+            android:icon="@android:drawable/ic_menu_slideshow"
+            android:title="videos" />
+        <item
+            android:icon="@drawable/icon_friends_tab"
+            android:title="mutual friends" />
+    </group>
+
+
+</menu>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+tools:context="com.square.apps.amigos.Activities.AddCourseActivity">
+
+<item
+    android:id="@+id/add_friends"
+    android:icon="@drawable/ic_action_add_course"
+    android:title="@string/add_friends_title"
+    app:showAsAction="ifRoom" />
+
+<item
+    android:icon="@drawable/ic_action_remove_class"
+    android:title="@string/remove_friends_title"
+    app:showAsAction="ifRoom" />
+
+
+</menu>

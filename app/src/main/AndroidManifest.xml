@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.square.apps.amigos"
+    tools:ignore="MissingLeanbackLauncher">
+
+    <uses-sdk
+        android:versionCode="1"
+        android:versionName="1.0" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+     To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user. This disconnect
+     option is required to comply with the Google+ Sign-In developer policies
+    -->
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <!-- To retrieve the account name (email) as part of sign-in: -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+
+
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+
+        <!--
+Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_ic_notification" />
+
+        <activity
+            android:name=".Activities.LauncherActivity"
+            android:label="@string/app_name"
+            android:theme="@style/FullscreenTheme"
+            tools:ignore="InnerclassSeparator">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Activities.MainActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            tools:ignore="InnerclassSeparator" />
+        <activity
+            android:name=".Activities.LoginActivity"
+            android:label="@string/app_name"
+            tools:ignore="InnerclassSeparator" />
+        <activity
+            android:name=".Activities.RegisterActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustPan"
+            tools:ignore="InnerclassSeparator" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".Activities.TabHome"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="InnerclassSeparator">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
+        </activity>
+        <activity
+            android:name=".Activities.SearchFriendsActivity"
+            android:label="@string/search_title"
+            android:launchMode="singleTop"
+            tools:ignore="InnerclassSeparator">
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Activities.CoursePagerActivity"
+            tools:ignore="InnerclassSeparator" />
+        <activity android:name=".Activities.FriendListActivity"
+            tools:ignore="InnerclassSeparator" />
+        <activity
+            android:name=".Activities.AddCourseActivity"
+            android:launchMode="singleTop"
+            tools:ignore="InnerclassSeparator">
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Activities.FriendActivity"
+            tools:ignore="InnerclassSeparator" />
+
+        <!-- [START gcm_listener] -->
+        <service android:name=".Gcm.MyFcmListenerService"
+            tools:ignore="ExportedService,InnerclassSeparator">
+            <intent-filter>
+                       
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                   
+            </intent-filter>
+        </service>
+        <!-- [END gcm_listener] -->
+
+
+        <!-- [START fb_listener] -->
+        <service android:name=".Gcm.MyInstanceIDListenerService"
+            tools:ignore="ExportedService,InnerclassSeparator">
+               
+            <intent-filter>
+                       
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+                   
+            </intent-filter>
+        </service>
+        <!-- [END instanceId_listener] -->
+
+        <service android:name=".Services.sendMessageIntentService"
+            tools:ignore="InnerclassSeparator" />
+        <service android:name=".Services.GetPendingRequestsServiceIntent"
+            tools:ignore="InnerclassSeparator" />
+        <service android:name=".Services.acceptRejectFriendRequest"
+            tools:ignore="InnerclassSeparator" />
+        <service android:name=".Services.SearchClassesIntentService"
+            tools:ignore="InnerclassSeparator" />
+        <service android:name=".Services.AddCourseService"
+            tools:ignore="InnerclassSeparator" />
+        <service android:name=".Services.AddDeleteFriendsService"
+            tools:ignore="InnerclassSeparator" />
+        <service android:name=".Services.SendProfilePicToDb"
+            tools:ignore="InnerclassSeparator" />
+        <service android:name=".Services.RemoveCourseService"
+            tools:ignore="InnerclassSeparator" />
+
+        <provider
+            android:name=".common.common.db.DataProvider"
+            android:authorities="com.square.apps.provider"
+            android:exported="false" />
+        <provider
+            android:name=".common.common.db.MySuggestionProvider"
+            android:authorities="com.square.apps.MySuggestionProvider"
+            tools:ignore="ExportedContentProvider" />
+
+        <activity
+            android:name=".Activities.SettingsActivity"
+            android:label="@string/action_settings"
+            tools:ignore="InnerclassSeparator" />
+        <activity
+            android:name=".Activities.ChatActivity"
+            android:label="@string/title_activity_test"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="InnerclassSeparator" />
+
+        <service
+            android:name=".Services.UpdateCountService"
+            android:exported="false"
+            tools:ignore="InnerclassSeparator" />
+        <service
+            android:name=".Services.RetrieveBuffMsgsService"
+            android:exported="false"
+            tools:ignore="InnerclassSeparator" />
+
+        <activity
+            android:name=".Activities.FUAPActivity"
+            android:label="@string/title_activity_fuap"
+            android:parentActivityName=".Activities.LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="InnerclassSeparator" />
+    </application>
+
+</manifest>

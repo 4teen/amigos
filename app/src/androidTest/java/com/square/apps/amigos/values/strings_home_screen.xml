@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="class_schedule_text_view">My Classes</string>
+    <string name="friends_text">My Friends</string>
+    <string name="forum_text">Forums</string>
+    <string name="logout_text">Log me Out</string>
+
+
+    <string name="title_activity_profile">My Profile</string>
+    <string name="camera_button">Camera</string>
+    <string name="from_file_text">From File</string>
+
+    <string name="title_activity_calendar">My Class Schedule</string>
+
+
+    <string name="title_activity_forums">Forums</string>
+
+
+</resources>

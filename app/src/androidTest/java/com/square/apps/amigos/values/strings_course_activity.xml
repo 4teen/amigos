@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="course_title_hint">Enter a title for the course.</string>
+    <string name="courses_title">COURSES</string>
+    <string name="campus_key">Campus </string>
+    <string name="college_key">College </string>
+    <string name="department_key">Department </string>
+    <string name="SubjectCRV_Key">Subject Id </string>
+    <string name="crn_key">CRN </string>
+    <string name="title_key">Title </string>
+    <string name="add_buttom">Add Course</string>
+    <string name="add_course_title">Add a class</string>
+    <string name="add_courses_button">Add courses</string>
+    <string name="searchButton">Find course</string>
+
+    <string-array name="spinner_list">
+        <item>CRN</item>
+        <item>SubjectCRS</item>
+        <item>Title</item>
+    </string-array>
+
+</resources>

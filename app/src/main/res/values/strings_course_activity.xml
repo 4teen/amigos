@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_course_title">Add class</string>
+
+    <string-array name="Search_courses_spinner_list">
+        <item>Class CRN</item>
+        <item>Class Subject</item>
+        <item>Class Title</item>
+    </string-array>
+
+    <string-array name="Search_friends_spinner_list">
+        <item>Email</item>
+        <item>Name</item>
+    </string-array>
+
+</resources>
