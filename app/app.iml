@@ -107,6 +107,7 @@
     <orderEntry type="library" exported="" name="play-services-games-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-panorama-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="firebase-dynamic-links-11.0.1" level="project" />
+    <orderEntry type="library" exported="" name="picasso-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-tagmanager-v4-impl-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="firebase-crash-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-appinvite-11.0.1" level="project" />
@@ -150,6 +151,7 @@
     <orderEntry type="library" exported="" name="play-services-basement-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-auth-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="firebase-iid-11.0.1" level="project" />
+    <orderEntry type="library" exported="" name="constraint-layout-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-auth-api-phone-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="transition-25.4.0" level="project" />
     <orderEntry type="library" exported="" name="firebase-storage-11.0.1" level="project" />
@@ -160,6 +162,7 @@
     <orderEntry type="library" exported="" name="leanback-v17-25.4.0" level="project" />
     <orderEntry type="library" exported="" name="firebase-appindexing-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-wearable-11.0.1" level="project" />
+    <orderEntry type="library" exported="" name="constraint-layout-solver-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-tagmanager-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-drive-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-safetynet-11.0.1" level="project" />

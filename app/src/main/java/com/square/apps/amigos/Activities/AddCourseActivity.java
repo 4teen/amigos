@@ -38,7 +38,7 @@ public class AddCourseActivity extends SingleFragmentActivity implements AddCour
 
     @Override
     protected void onNewIntent(@NonNull Intent intent) {
-        AddCourseFragment addCourseFragment = (AddCourseFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
+        AddCourseFragment addCourseFragment = (AddCourseFragment) getFragmentManager().findFragmentById(R.id.fragmentContainer);
         addCourseFragment.handleIntent(intent);
     }
 

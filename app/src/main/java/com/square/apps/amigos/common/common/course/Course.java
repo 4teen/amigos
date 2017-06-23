@@ -25,116 +25,122 @@ public class Course {
     private String college;
     private String days;
 
+    public Course(){
+
+    }
+
     @Override
-    public String toString() {
+    public String toString(){
         return title;
     }
 
-    public String getTitle() {
+    public String getTitle(){
         return title;
     }
 
-    public void setTitle(String mtitle) {
+    public void setTitle(String mtitle){
         this.title = mtitle;
     }
 
     /**
      * getters
      */
-    public String getClassTime() {
+    public String getClassTime(){
         return classTime;
     }
 
-    public void setClassTime(String classTime) {
+    public void setClassTime(String classTime){
         this.classTime = classTime;
     }
 
-    public String getDays() {
+    public String getDays(){
         return days;
     }
 
-    public void setDays(String days) {
+    public void setDays(String days){
         this.days = days;
     }
 
-    public String getSubjectCRS() {
+    public String getSubjectCRS(){
         return subjectCRS;
     }
 
     /**
      * setters
      **/
-    public void setSubjectCRS(String subjectCRS) {
+    public void setSubjectCRS(String subjectCRS){
         this.subjectCRS = subjectCRS;
     }
 
-    public String getCRN() {
+    public String getCRN(){
         return CRN;
     }
 
-    public void setCRN(String CRN) { this.CRN = CRN;  }
+    public void setCRN(String CRN){
+        this.CRN = CRN;
+    }
 
-    public String getCampus() {
+    public String getCampus(){
         return campus;
     }
 
-    public void setCampus(String campus) {
+    public void setCampus(String campus){
         this.campus = campus;
     }
 
-    public String getDepartment() {
+    public String getDepartment(){
         return department;
     }
 
-    public void setDepartment(String department) {
+    public void setDepartment(String department){
         this.department = department;
     }
 
-    public String getSection() {
+    public String getSection(){
         return section;
     }
 
-    public void setSection(String session) {
+    public void setSection(String session){
         this.section = session;
     }
 
-    public String getCollege() {
+    public String getCollege(){
         return college;
     }
 
-    public void setCollege(String college) {
+    public void setCollege(String college){
         this.college = college;
     }
 
-    public String getBuilding() {
+    public String getBuilding(){
         return building;
     }
 
-    public void setBuilding(String building) {
+    public void setBuilding(String building){
         this.building = building;
     }
 
-    public String getRoom() {
+    public String getRoom(){
         return room;
     }
 
-    public void setRoom(String room) {
+    public void setRoom(String room){
         this.room = room;
     }
 
-    public String getInstructor() {
+    public String getInstructor(){
         return instructor;
     }
 
-    public void setInstructor(String instructor) {
+    public void setInstructor(String instructor){
         this.instructor = instructor;
     }
 
-    public String getCourseID() {
+    public String getCourseID(){
         return courseID;
     }
 
-    public void setCourseID(String courseID) {
+    public void setCourseID(String courseID){
         this.courseID = courseID;
     }
 

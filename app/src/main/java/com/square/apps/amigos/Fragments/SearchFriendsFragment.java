@@ -1,20 +1,19 @@
 package com.square.apps.amigos.Fragments;
 
+import android.app.ListFragment;
+import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
@@ -23,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import com.square.apps.amigos.Contract;
@@ -33,10 +33,10 @@ import com.square.apps.amigos.common.common.db.MySuggestionProvider;
 
 public class SearchFriendsFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    private Spinner spinner;
+    private Spinner             spinner;
     private SimpleCursorAdapter tempFriendAdapter;
     @Nullable
-    private Callbacks mListener;
+    private Callbacks           mListener;
 
     @Override
     public void onAttach(Context activity) {
@@ -103,7 +103,7 @@ public class SearchFriendsFragment extends ListFragment implements LoaderManager
                 android.R.id.text1,
                 android.R.id.text2,
         };
-        tempFriendAdapter = new android.support.v4.widget.SimpleCursorAdapter(getActivity(),
+        tempFriendAdapter = new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_list_item_2, null,
                 PROJECTION,
                 TO, 0);

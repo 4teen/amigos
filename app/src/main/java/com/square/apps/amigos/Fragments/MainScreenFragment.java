@@ -1,14 +1,13 @@
 package com.square.apps.amigos.Fragments;
 
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +16,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.square.apps.amigos.Activities.LoginActivity;
-import com.square.apps.amigos.Contract;
 import com.square.apps.amigos.R;
+import com.squareup.picasso.Picasso;
 
 
 public class MainScreenFragment extends Fragment {
@@ -34,19 +34,19 @@ public class MainScreenFragment extends Fragment {
     private Callbacks callbacks;
 
     @Override
-    public void onAttach(Context activity) {
+    public void onAttach(Context activity){
         super.onAttach(activity);
         callbacks = (Callbacks) activity;
     }
 
     @Override
-    public void onDetach() {
+    public void onDetach(){
         super.onDetach();
         callbacks = null;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
         // [START initialize_auth]
@@ -55,8 +55,7 @@ public class MainScreenFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.activity_profile, container, false);
 
         /*
@@ -68,8 +67,12 @@ public class MainScreenFragment extends Fragment {
         /* Initializing buttons**/
         logout = (Button) view.findViewById(R.id.button_logout);
 
-        myName.setText(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(Contract.NAME, null));
 
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        Picasso.with(getActivity()).load(user.getPhotoUrl()).placeholder(R.drawable.tampa_skyline).into(myProfilePic);
+
+        myName.setText(user.getDisplayName());
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.profile_image_fab);
 
@@ -79,15 +82,15 @@ public class MainScreenFragment extends Fragment {
         return view;
     }
 
-    private void Button_logout_Listener() {
+    private void Button_logout_Listener(){
         logout.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            public void onClick(View v){
                 logoutUser();
             }
         });
     }
 
-    private void logoutUser() {
+    private void logoutUser(){
         mAuth.signOut();
         Intent i = new Intent(getActivity(), LoginActivity.class);
         startActivity(i);

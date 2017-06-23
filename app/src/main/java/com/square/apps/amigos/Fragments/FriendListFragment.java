@@ -1,16 +1,17 @@
 package com.square.apps.amigos.Fragments;
 
+import android.app.ListFragment;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 import com.square.apps.amigos.Contract;
 import com.square.apps.amigos.R;
@@ -30,7 +31,7 @@ public class FriendListFragment extends ListFragment implements LoaderManager.Lo
     private SimpleCursorAdapter friendsAdapter;
 
     @NonNull
-    public static FriendListFragment newInstance(String courseID) {
+    public static FriendListFragment newInstance(String courseID){
         Bundle bundle = new Bundle();
         bundle.putSerializable(Contract.COURSE_ID, courseID);
         FriendListFragment friendListFragment = new FriendListFragment();
@@ -42,7 +43,7 @@ public class FriendListFragment extends ListFragment implements LoaderManager.Lo
      * Assign the Activity in the fragment lifeCycle
      */
     @Override
-    public void onAttach(Context activity) {
+    public void onAttach(Context activity){
         super.onAttach(activity);
         mCallbacks = (Callbacks) activity;
     }
@@ -52,27 +53,21 @@ public class FriendListFragment extends ListFragment implements LoaderManager.Lo
      * the Activity to continue to exists
      **/
     @Override
-    public void onDetach() {
+    public void onDetach(){
         super.onDetach();
         mCallbacks = null;
     }
 
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
 
-        String[] PROJECTION = new String[]{
-                Contract.NAME,
-                Contract.EMAIL,};
+        String[] PROJECTION = new String[]{Contract.NAME, Contract.EMAIL,};
 
-        int[] TO = new int[]{
-                R.id.main_list_item_text1,
-                R.id.main_list_item_text2,};
+        int[] TO = new int[]{R.id.main_list_item_text1, R.id.main_list_item_text2,};
 
-        friendsAdapter = new SimpleCursorAdapter(getActivity(),
-                R.layout.main_list_item, null,
-                PROJECTION, TO, 0);
+        friendsAdapter = new SimpleCursorAdapter(getActivity(), R.layout.main_list_item, null, PROJECTION, TO, 0);
 
         setEmptyText("OHH Brotha, Talk to somebody...");
         setListShown(false);
@@ -82,23 +77,16 @@ public class FriendListFragment extends ListFragment implements LoaderManager.Lo
 
     @Nullable
     @Override
-    public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args){
         String courseID = (String) getArguments().getSerializable(Contract.COURSE_ID);
 
-        final String[] PROJECTION = new String[]{
-                Contract.EMAIL,
-                Contract.NAME,
-                Contract.COURSE_ID,
-                Contract.PRIMARY_KEY,
-        };
+        final String[] PROJECTION = new String[]{Contract.EMAIL, Contract.NAME, Contract.COURSE_ID, Contract.PRIMARY_KEY,};
 
-        return new CursorLoader(getActivity()
-                , DataProvider.CONTENT_URI_FRIENDS
-                , PROJECTION, Contract.COURSE_ID + " = ?", new String[]{courseID}, Contract.NAME);
+        return new CursorLoader(getActivity(), DataProvider.CONTENT_URI_FRIENDS, PROJECTION, Contract.COURSE_ID + " = ?", new String[]{courseID}, Contract.NAME);
     }
 
     @Override
-    public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data){
         friendsAdapter.swapCursor(data);
         // The list should now be shown.
         if (isResumed()) {
@@ -109,12 +97,12 @@ public class FriendListFragment extends ListFragment implements LoaderManager.Lo
     }
 
     @Override
-    public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<Cursor> loader){
         friendsAdapter.swapCursor(null);
     }
 
     @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
+    public void onListItemClick(ListView listView, View view, int position, long id){
         Cursor cursor = (Cursor) friendsAdapter.getItem(position);
         if ((cursor.getCount() <= 0)) throw new AssertionError();
         String friendID = cursor.getString(cursor.getColumnIndex(Contract.PRIMARY_KEY));

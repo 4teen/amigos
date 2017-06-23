@@ -1,10 +1,10 @@
 package com.square.apps.amigos.Abstract;
 
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.square.apps.amigos.R;
@@ -34,7 +34,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         setContentView(getLayoutResID());
 
         /*gets instance of fragment manager**/
-       FragmentManager supportFragmentManager = getSupportFragmentManager();
+       FragmentManager supportFragmentManager = getFragmentManager();
 
         /**Fragment transaction******
          ask Fragment manager for the Course fragment with the container view ID of R.id.fragmentContainer

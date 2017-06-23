@@ -1,29 +1,39 @@
 package com.square.apps.amigos.Fragments;
 
 
-import android.app.Activity;
-import android.database.Cursor;
+import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.square.apps.amigos.Contract;
 import com.square.apps.amigos.R;
-import com.square.apps.amigos.common.common.db.DataProvider;
+import com.square.apps.amigos.common.common.course.Course;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
-@SuppressWarnings("deprecation")
-public class CourseListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CourseListFragment extends Fragment {
+
+    //[START declare_RecyclerView]
+    private RecyclerView mRecyclerView;
+    //[END declare_RecyclerView]
+
+    //[START declare_RecyclerView_Adapter]
+    private CourseAdapter mAdapter;
+    //[END declare_RecyclerView_Adapter]
 
     /**
      * listener
@@ -31,18 +41,14 @@ public class CourseListFragment extends ListFragment implements LoaderManager.Lo
     @Nullable
     private Callbacks mCallbacks;
 
-    /**
-     * Cursor Adapter
-     */
-    private SimpleCursorAdapter courseAdapter;
 
     /**
      * Assign the Activity in the fragment lifeCycle
      */
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mCallbacks = (Callbacks) activity;
+    public void onAttach(Context context){
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
         Log.d("onAttached", "was called");
     }
 
@@ -51,77 +57,38 @@ public class CourseListFragment extends ListFragment implements LoaderManager.Lo
      * the Activity to continue to exists
      **/
     @Override
-    public void onDetach() {
+    public void onDetach(){
         super.onDetach();
         mCallbacks = null;
     }
 
-    @Nullable
     @Override
-    public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-     //  Log.d("oncreate", "was called");
-        final String[] projection = new String[]{
-                Contract.SUBJECT_CRS,
-                Contract.TITLE,
-                Contract.TIME,
-                Contract.PRIMARY_KEY,
-        };
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+        View view = inflater.inflate(R.layout.course_list_fragment, container, false);
 
-        return new CursorLoader(getActivity()
-                , DataProvider.CONTENT_URI_COURSES
-                , projection, null, null, null);
+        //[START initialize RecyclerView]
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.course_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        //[END initialize_RecyclerView]
+
+        updateUI();
+
+        return view;
+    }
+
+    private void updateUI(){
+        // CrimeLab crimeLab = CrimeLab.get(getActivity());
+        List<Course> courses = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            courses.add(new Course());
+        }
+
+        mAdapter = new CourseAdapter(courses);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
-    public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
-    //    Log.d("onLoadfinished", "was called");
-        courseAdapter.swapCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
-        courseAdapter.swapCursor(null);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-  //      Log.d("onActivityCreated", "was called");
-        setEmptyText("Loading Courses...");
-        setListShown(false);
-        setHasOptionsMenu(true);
-
-        final String[] PROJECTION = new String[]{
-                Contract.SUBJECT_CRS,
-                Contract.TITLE,
-                Contract.TIME,
-        };
-
-        final int[] TO = new int[]{
-                R.id.textViewSubject,
-                R.id.textViewTitle,
-                R.id.textViewTime,
-        };
-
-        courseAdapter = new SimpleCursorAdapter(getActivity(),
-                R.layout.course_list_fragment, null,
-                PROJECTION,
-                TO, 0);
-        setListAdapter(courseAdapter);
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-        Cursor cursor = (Cursor) courseAdapter.getItem(position);
-        if ((cursor.getCount() <= 0)) throw new AssertionError();
-        //cursor.move(position);
-        String CourseID = cursor.getString(cursor.getColumnIndex(DataProvider.COL_ID));
-        mCallbacks.onCourseSelected(CourseID);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item){
         switch (item.getItemId()) {
             case R.id.add_course:
                 mCallbacks.onAddCourse();
@@ -134,10 +101,11 @@ public class CourseListFragment extends ListFragment implements LoaderManager.Lo
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater){
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_add_course, menu);
     }
+
 
     /**
      * Required interface for hosting activities.
@@ -146,6 +114,65 @@ public class CourseListFragment extends ListFragment implements LoaderManager.Lo
         void onCourseSelected(String CourseID);
 
         void onAddCourse();
+    }
+
+    /**
+     * RecclerVIew.Adapter calls this class to create a viewHolder
+     */
+    private class CourseHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private Course course;
+
+        private TextView mTitleTextView;
+        private TextView mSubtitleTextView;
+        private TextView mDescriptionTextView;
+
+        public CourseHolder(LayoutInflater inflater, ViewGroup parent){
+            super(inflater.inflate(R.layout.course_list_item, parent, false));
+            itemView.setOnClickListener(this);
+
+            mTitleTextView = (TextView) itemView.findViewById(R.id.course_title_tv);
+            mSubtitleTextView = (TextView) itemView.findViewById(R.id.course_subtitle);
+            mDescriptionTextView = (TextView) itemView.findViewById(R.id.course_description_tv);
+        }
+
+        public void bind(Course course){
+            this.course = course;
+            mTitleTextView.setText("This is my course Title");
+            mSubtitleTextView.setText("Course Subtitle");
+            mDescriptionTextView.setText("Tampa, the third-largest city in the U.S. state of Florida, is home to 127 completed high-rises,[1] 18 of which stand taller than 250 feet (76 m). ");
+        }
+
+        @Override
+        public void onClick(View view){
+            Toast.makeText(getActivity(), course.getTitle() + " clicked!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class CourseAdapter extends RecyclerView.Adapter<CourseHolder> {
+
+        private List<Course> mCourses;
+
+        public CourseAdapter(List<Course> courses){
+            mCourses = courses;
+        }
+
+        @Override
+        public CourseHolder onCreateViewHolder(ViewGroup parent, int viewType){
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            return new CourseHolder(layoutInflater, parent);
+        }
+
+        @Override
+        public void onBindViewHolder(CourseHolder holder, int position){
+            Course course = mCourses.get(position);
+            holder.bind(course);
+        }
+
+        @Override
+        public int getItemCount(){
+            return mCourses.size();
+        }
     }
 
 }

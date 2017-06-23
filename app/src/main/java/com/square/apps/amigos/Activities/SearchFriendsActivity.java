@@ -26,7 +26,7 @@ public class SearchFriendsActivity extends SingleFragmentActivity implements Sea
 
     @Override
     protected void onNewIntent(@NonNull Intent intent) {
-        SearchFriendsFragment searchFriendsFragment = (SearchFriendsFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
+        SearchFriendsFragment searchFriendsFragment = (SearchFriendsFragment) getFragmentManager().findFragmentById(R.id.fragmentContainer);
         searchFriendsFragment.handleIntent(intent);
     }
 
