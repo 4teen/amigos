@@ -16,7 +16,7 @@
         <menu>
             <item
                 android:icon="@android:drawable/ic_menu_send"
-            android:title="message" />
+                android:title="message" />
             <item
                 android:icon="@drawable/ic_mail"
                 android:title="email" />

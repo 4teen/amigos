@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.square.apps.amigos.R;
 
 /**
- * A placeholder fragment containing a simple view.
+ * A placeholder fragment containing a simple view. (Forgot User and Password)
  */
 public class FUAPFragment extends Fragment {
 

@@ -1,16 +1,14 @@
 package com.square.apps.amigos.Fragments;
 
-/*
-  Created by YOEL on 9/12/2015.
- */
-
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +20,6 @@ import android.widget.TextView;
 
 import com.square.apps.amigos.R;
 import com.square.apps.amigos.common.common.course.Course;
-import com.square.apps.amigos.common.common.course.CourseLab;
 
 
 /**
@@ -34,7 +31,7 @@ import com.square.apps.amigos.common.common.course.CourseLab;
 public class CourseFragment extends Fragment {
     private static final String EXTRA_COURSE_ID = "null";
     @Nullable
-    private Course course;
+    private Course    course;
     @Nullable
     private Callbacks callbacks;
 
@@ -43,7 +40,7 @@ public class CourseFragment extends Fragment {
      **/
 
     @NonNull
-    public static CourseFragment newInstance(String courseID) {
+    public static CourseFragment newInstance(String courseID){
         Bundle bundle = new Bundle();
         bundle.putSerializable(EXTRA_COURSE_ID, courseID);
         CourseFragment courseFragment = new CourseFragment();
@@ -52,35 +49,34 @@ public class CourseFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Activity activity){
         super.onAttach(activity);
         callbacks = (Callbacks) activity;
     }
 
     @Override
-    public void onDetach() {
+    public void onDetach(){
         super.onDetach();
         callbacks = null;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         String courseID = (String) getArguments().getSerializable(EXTRA_COURSE_ID);
-        course = CourseLab.get(getActivity().getApplicationContext()).getCourse(courseID);
-        setHasOptionsMenu(true);
+        course = new Course();
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater){
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_delete_course, menu);
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item){
         switch (item.getItemId()) {
-            case R.id.remove_course:
+            case R.id.action_settings:
                 assert callbacks != null;
                 callbacks.onRemoveCourse();
                 return true;
@@ -94,8 +90,15 @@ public class CourseFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.course_detail, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+        View view = inflater.inflate(R.layout.course_detail_fragment, container, false);
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.detail_course_toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
+
+        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) view.findViewById(R.id.detail_course_collapsingToolBarLayout);
+
 
         TextView college = (TextView) view.findViewById(R.id.collegeSum);
         TextView department = (TextView) view.findViewById(R.id.departmentSum);
@@ -124,7 +127,7 @@ public class CourseFragment extends Fragment {
 
         findFriends.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v){
                 assert callbacks != null;
                 callbacks.onFindFriendsButtonPushed(course);
             }

@@ -12,13 +12,3 @@
     <corners android:radius="8dp" />
 </shape>
 
-    <!--
-    <solid
-            android:color="@android:color/white" />
-        <corners
-            android:radius="5dp"/>
-        <padding
-            android:left="10dp"
-            android:top="5dp"
-            android:right="10dp"
-            android:bottom="5dp" /> -->

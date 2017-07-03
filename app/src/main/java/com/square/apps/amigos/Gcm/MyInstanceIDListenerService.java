@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 /**
  * Created by YOEL on 11/3/2015.
@@ -11,7 +12,8 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 @SuppressWarnings("ALL")
 public class MyInstanceIDListenerService extends FirebaseInstanceIdService {
 
-    private static final String TAG = "MyInstanceIDLS";
+    private static final String TAG = "MyFirebaseIIDService";
+    private static final String FRIENDLY_ENGAGE_TOPIC = "friendly_engage";
 
     /**
      *    * Called if InstanceID token is updated. This may occur if the security of
@@ -26,7 +28,11 @@ public class MyInstanceIDListenerService extends FirebaseInstanceIdService {
 
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Refreshed token: " + refreshedToken);
-        // Fetch updated Instance ID token and notify our app's server of any changes (if applicable).
+
+
+        // Once a token is generated, we subscribe to topic.
+        FirebaseMessaging.getInstance()
+                         .subscribeToTopic(FRIENDLY_ENGAGE_TOPIC);
 
 
     }

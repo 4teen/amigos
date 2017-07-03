@@ -3,6 +3,8 @@ package com.square.apps.amigos.Fragments;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.square.apps.amigos.Activities.DetailActivity;
+import com.square.apps.amigos.CourseFetchr;
 import com.square.apps.amigos.R;
 import com.square.apps.amigos.common.common.course.Course;
 
@@ -34,6 +38,8 @@ public class CourseListFragment extends Fragment {
     //[START declare_RecyclerView_Adapter]
     private CourseAdapter mAdapter;
     //[END declare_RecyclerView_Adapter]
+
+    private List<Course> mCourses = new ArrayList<>();
 
     /**
      * listener
@@ -63,28 +69,30 @@ public class CourseListFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        new FetchItemsTask().execute();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        View view = inflater.inflate(R.layout.course_list_fragment, container, false);
+        View view = inflater.inflate(R.layout.course_list_recycler_view, container, false);
 
         //[START initialize RecyclerView]
         mRecyclerView = (RecyclerView) view.findViewById(R.id.course_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         //[END initialize_RecyclerView]
 
-        updateUI();
+        setupAdapter();
 
         return view;
     }
 
-    private void updateUI(){
-        // CrimeLab crimeLab = CrimeLab.get(getActivity());
-        List<Course> courses = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            courses.add(new Course());
+    private void setupAdapter(){
+        if (isAdded()) {
+            mRecyclerView.setAdapter(new CourseAdapter(mCourses));
         }
-
-        mAdapter = new CourseAdapter(courses);
-        mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
@@ -138,14 +146,17 @@ public class CourseListFragment extends Fragment {
 
         public void bind(Course course){
             this.course = course;
-            mTitleTextView.setText("This is my course Title");
-            mSubtitleTextView.setText("Course Subtitle");
+            mTitleTextView.setText(course.getTitle());
+            mSubtitleTextView.setText(course.getPrefix() + course.getNumber());
             mDescriptionTextView.setText("Tampa, the third-largest city in the U.S. state of Florida, is home to 127 completed high-rises,[1] 18 of which stand taller than 250 feet (76 m). ");
         }
 
         @Override
         public void onClick(View view){
             Toast.makeText(getActivity(), course.getTitle() + " clicked!", Toast.LENGTH_SHORT).show();
+            Context context = view.getContext();
+            Intent intent = new Intent(context, DetailActivity.class);
+            context.startActivity(intent);
         }
     }
 
@@ -174,5 +185,19 @@ public class CourseListFragment extends Fragment {
             return mCourses.size();
         }
     }
+
+    private class FetchItemsTask extends AsyncTask<Void, Void, List<Course>> {
+        @Override
+        protected List<Course> doInBackground(Void... params){
+            return new CourseFetchr().fetchCourses();
+        }
+
+        @Override
+        protected void onPostExecute(List<Course> courses){
+            mCourses = courses;
+            setupAdapter();
+        }
+    }
+
 
 }

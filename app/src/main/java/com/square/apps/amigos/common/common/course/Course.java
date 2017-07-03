@@ -24,9 +24,36 @@ public class Course {
     private String room;
     private String college;
     private String days;
+    private String level;
+    private String prefix;
+    private String number;
 
     public Course(){
 
+    }
+
+    public String getLevel(){
+        return level;
+    }
+
+    public void setLevel(String level){
+        this.level = level;
+    }
+
+    public String getPrefix(){
+        return prefix;
+    }
+
+    public void setPrefix(String prefix){
+        this.prefix = prefix;
+    }
+
+    public String getNumber(){
+        return number;
+    }
+
+    public void setNumber(String number){
+        this.number = number;
     }
 
     @Override
