@@ -53,10 +53,10 @@ import com.square.apps.amigos.Activities.LoginActivity;
 import com.square.apps.amigos.Activities.RegisterActivity;
 import com.square.apps.amigos.Activities.TabHome;
 import com.square.apps.amigos.R;
-import com.square.apps.amigos.common.common.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -69,7 +69,9 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 
 @SuppressWarnings({"ALL", "JavaDoc"})
-public class LoginFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
+public class LoginFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
+        , GoogleApiClient.OnConnectionFailedListener
+        , View.OnClickListener {
 
 
     //Private statics Constants
@@ -132,9 +134,9 @@ public class LoginFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
 
     }
 
@@ -450,14 +452,17 @@ public class LoginFragment extends Fragment implements LoaderManager.LoaderCallb
         Snackbar.make(view, errorMessageRes, Snackbar.LENGTH_LONG).show();
     }
 
-    private void onAuthSuccess(FirebaseUser user) {
-        String username = usernameFromEmail(user.getEmail());
+    private void onAuthSuccess(final FirebaseUser user) {
+        String username = user.getDisplayName();
+
+        if (username == null)
+            username = usernameFromEmail(user.getEmail());
+
 
         // Write new user
         writeNewUser(user.getUid(), username, user.getEmail());
+        // Go to TabhomeActivity
 
-        // Go to MainActivity
-        initiateTabHomeActivity();
     }
 
     private String usernameFromEmail(String email) {
@@ -470,8 +475,11 @@ public class LoginFragment extends Fragment implements LoaderManager.LoaderCallb
 
     // [START basic_write]
     private void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email);
-        mDatabase.child("users").child(userId).setValue(user);
+        HashMap<String, Object> mymap = new HashMap<>();
+        mymap.put("users/" + userId + "/name", name);
+        mymap.put("users/" + userId + "/email", email);
+        mDatabase.updateChildren(mymap);
+        initiateTabHomeActivity();
     }
 
     private interface ProfileQuery {

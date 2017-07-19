@@ -8,7 +8,6 @@
     android:fitsSystemWindows="true">
 
     <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/tabHome_coordinating_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -30,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_scrollFlags="scroll|enterAlways"
-                app:tabMode="scrollable">
+                app:tabMode="fixed">
 
             </android.support.design.widget.TabLayout>
         </android.support.design.widget.AppBarLayout>

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<transitionManager xmlns:android="http://schemas.android.com/apk/res/android">
-    <transition android:transition="@transition/lb_shared_element_enter_transition" />
-
-</transitionManager>

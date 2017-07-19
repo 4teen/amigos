@@ -1,0 +1,39 @@
+package com.square.apps.amigos.common.common;
+
+import android.net.Uri;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+public class FirebaseUtils {
+
+
+    public void setImageView(Uri imageUri, ImageView imageView) {
+        imageView.setImageURI(imageUri);
+    }
+
+    public void setImageView(String url, ImageView imageView) {
+        if (url.startsWith("gs")) {
+            StorageReference storageReference = FirebaseStorage
+                    .getInstance()
+                    .getReferenceFromUrl(url);
+
+            // Load the image using Glide
+            Glide.with(imageView.getContext() /* context */)
+                    .using(new FirebaseImageLoader())
+                    .load(storageReference)
+                    .fitCenter()
+                    .into(imageView);
+        } else {
+            Glide.with(imageView.getContext())
+                    .load(url)
+                    .fitCenter()
+                    .into(imageView);
+        }
+    }
+
+
+}

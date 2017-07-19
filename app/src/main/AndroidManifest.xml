@@ -25,7 +25,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
 
-
     <uses-feature
         android:name="android.software.leanback"
         android:required="false" />
@@ -45,7 +44,7 @@ Set custom default icon. This is used when no icon is set for incoming notificat
         -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_stat_ic_notification" />
+            android:resource="@drawable/ic_message_black_24dp" />
 
         <activity
             android:name=".Activities.LauncherActivity"
@@ -57,11 +56,6 @@ Set custom default icon. This is used when no icon is set for incoming notificat
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Activities.MainActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            tools:ignore="InnerclassSeparator" />
         <activity
             android:name=".Activities.LoginActivity"
             android:label="@string/app_name"
@@ -86,7 +80,7 @@ Set custom default icon. This is used when no icon is set for incoming notificat
                 android:value="splitActionBarWhenNarrow" />
         </activity>
         <activity
-            android:name=".Activities.SearchFriendsActivity"
+            android:name=".Activities.SearchUsersActivity"
             android:label="@string/search_title"
             android:launchMode="singleTop"
             tools:ignore="InnerclassSeparator">
@@ -102,10 +96,7 @@ Set custom default icon. This is used when no icon is set for incoming notificat
             android:name=".Activities.DetailActivity"
             tools:ignore="InnerclassSeparator" />
         <activity
-            android:name=".Activities.FriendListActivity"
-            tools:ignore="InnerclassSeparator" />
-        <activity
-            android:name=".Activities.searchCourseActivity"
+            android:name=".Activities.SearchFormActivity"
             android:launchMode="singleTop"
             tools:ignore="InnerclassSeparator">
             <meta-data
@@ -116,9 +107,6 @@ Set custom default icon. This is used when no icon is set for incoming notificat
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Activities.FriendActivity"
-            tools:ignore="InnerclassSeparator" />
 
         <!-- [START gcm_listener] -->
         <service
@@ -146,31 +134,6 @@ Set custom default icon. This is used when no icon is set for incoming notificat
         </service>
         <!-- [END instanceId_listener] -->
 
-        <service
-            android:name=".Services.sendMessageIntentService"
-            tools:ignore="InnerclassSeparator" />
-        <service
-            android:name=".Services.GetPendingRequestsServiceIntent"
-            tools:ignore="InnerclassSeparator" />
-        <service
-            android:name=".Services.acceptRejectFriendRequest"
-            tools:ignore="InnerclassSeparator" />
-        <service
-            android:name=".Services.SearchClassesIntentService"
-            tools:ignore="InnerclassSeparator" />
-        <service
-            android:name=".Services.AddCourseService"
-            tools:ignore="InnerclassSeparator" />
-        <service
-            android:name=".Services.AddDeleteFriendsService"
-            tools:ignore="InnerclassSeparator" />
-        <service
-            android:name=".Services.SendProfilePicToDb"
-            tools:ignore="InnerclassSeparator" />
-        <service
-            android:name=".Services.RemoveCourseService"
-            tools:ignore="InnerclassSeparator" />
-
         <provider
             android:name=".common.common.db.DataProvider"
             android:authorities="com.square.apps.provider"
@@ -186,23 +149,28 @@ Set custom default icon. This is used when no icon is set for incoming notificat
             tools:ignore="InnerclassSeparator" />
         <activity
             android:name=".Activities.ChatActivity"
-            android:label="@string/title_activity_test"
+            android:label="@string/app_name"
+            android:parentActivityName=".Activities.TabHome"
             tools:ignore="InnerclassSeparator" />
-
-        <service
-            android:name=".Services.UpdateCountService"
-            android:exported="false"
-            tools:ignore="InnerclassSeparator" />
-        <service
-            android:name=".Services.RetrieveBuffMsgsService"
-            android:exported="false"
-            tools:ignore="InnerclassSeparator" />
-
         <activity
             android:name=".Activities.FUAPActivity"
             android:label="@string/title_activity_fuap"
             android:parentActivityName=".Activities.LoginActivity"
             tools:ignore="InnerclassSeparator" />
+        <activity
+            android:name=".Activities.ProfileSettingsActivity"
+            android:parentActivityName=".Activities.TabHome"
+            tools:ignore="InnerclassSeparator" />
+        <activity
+            android:name=".Activities.ChatMembersActivity"
+            android:label="@string/title_activity_chat_members"
+            android:parentActivityName=".Activities.ChatActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.square.apps.amigos.Activities.ChatActivity" />
+        </activity>
+        <activity android:name=".Activities.ChatMediaActivity"></activity>
     </application>
 
 </manifest>

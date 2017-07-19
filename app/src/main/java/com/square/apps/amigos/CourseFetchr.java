@@ -3,15 +3,20 @@ package com.square.apps.amigos;
 import android.net.Uri;
 import android.util.Log;
 
-import com.square.apps.amigos.common.common.course.Course;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
+import com.square.apps.amigos.Fragments.SearchFormFragment;
+import com.square.apps.amigos.common.common.Course;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,11 +27,12 @@ import java.util.List;
  */
 
 public class CourseFetchr {
+    public static final String PATH = "http://ec2-54-205-151-150.compute-1.amazonaws.com";
+    public static final String ENCODED_PATH = "amigosApp/amigos_login_api/getCourses.php";
     private static final String TAG = "CourseFetchr";
-
     private static final String API_KEY = "REPLACE_ME_WITH_A_REAL_KEY";
 
-    public byte[] getUrlBytes(String urlSpec) throws IOException{
+    public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST"); // sets HTTP method to POST
@@ -50,78 +56,58 @@ public class CourseFetchr {
         }
     }
 
-    public String getUrlString(String urlSpec) throws IOException{
+    public String getUrlString(String urlSpec) throws IOException {
         return new String(getUrlBytes(urlSpec));
     }
 
-    public List<Course> fetchCourses(){
-
+    public List<Course> fetchCourses(String prefix, String num, String credits, String title, String output) {
         List<Course> courses = new ArrayList<>();
+        Log.d(TAG, prefix + num + credits + title);
 
-        try {
-            String url = Uri.parse("http://ec2-54-205-151-150.compute-1.amazonaws.com/amigosApp/amigos_login_api/getCourses.php").buildUpon().appendQueryParameter("lvl", "u").appendQueryParameter("coll", "EN").appendQueryParameter("title", "program").appendQueryParameter("output", "search").build().toString();
-            Log.i(TAG, "Sent Jurl: " + url);
-            String jsonString = getUrlString(url);
-            Log.i(TAG, "Received JSON: " + jsonString);
-            JSONArray jsonBody = new JSONArray(jsonString);
-            parseItems(courses, jsonBody);
-        } catch (IOException ioe) {
-            Log.e(TAG, "Failed to fetch courses", ioe);
-        } catch (JSONException je) {
-            Log.e(TAG, "Failed to parse JSON", je);
-        }
-
-        return courses;
-    }
-
-    public List<Course> fetchCourses(String prefix, String dept, String coll, String lvl, String title){
-        List<Course> courses = new ArrayList<>();
-        Log.d(TAG, prefix + dept + coll + lvl + title);
+        final String PREFIX = (output.equals(SearchFormFragment.SEARCH) ? "prefix" : "subj");
 
         try {
 
             Uri.Builder builder = new Uri.Builder();
-            builder.encodedPath("http://ec2-54-205-151-150.compute-1.amazonaws.com");
-            builder.appendEncodedPath("amigosApp/amigos_login_api/getCourses.php");
-            builder.appendQueryParameter("output", "search");
+            builder.encodedPath(PATH);
+            builder.appendEncodedPath(ENCODED_PATH);
+            builder.appendQueryParameter("output", output);
 
-            if (!prefix.equals("")) builder.appendQueryParameter("prefix", prefix);
-            if (!dept.equals("")) builder.appendQueryParameter("dept", dept);
-            if (!coll.equals("")) builder.appendQueryParameter("coll", coll);
-            if (!lvl.equals("")) builder.appendQueryParameter("lvl", lvl);
+            if (!prefix.equals("")) builder.appendQueryParameter(PREFIX, prefix);
+            if (!num.equals("")) builder.appendQueryParameter("num", num);
+            if (!credits.equals("")) builder.appendQueryParameter("credits", credits);
             if (!title.equals("")) builder.appendQueryParameter("title", title);
 
             Uri uri = builder.build();
             String url = uri.toString();
-
             Log.i(TAG, "Sent Jurl: " + url);
             String jsonString = getUrlString(url);
             Log.i(TAG, "Received JSON: " + jsonString);
-            JSONArray jsonBody = new JSONArray(jsonString);
-            parseItems(courses, jsonBody);
+            courses = parseItems(jsonString);
         } catch (IOException ioe) {
             Log.e(TAG, "Failed to fetch courses", ioe);
-        } catch (JSONException je) {
+        } catch (JSONException | JsonParseException je) {
             Log.e(TAG, "Failed to parse JSON", je);
         }
+
 
         return courses;
     }
 
 
-    private void parseItems(List<Course> courses, JSONArray coursesJsonArray) throws IOException, JSONException{
+    private List<Course> parseItems(String jsonString) throws IOException, JSONException, JsonParseException {
 
-        for (int i = 0; i < coursesJsonArray.length(); i++) {
-            JSONObject courseJSONObject = coursesJsonArray.getJSONObject(i);
 
-            Course course = new Course();
-            course.setCollege(courseJSONObject.getString("College"));
-            course.setTitle(courseJSONObject.getString("Title"));
-            course.setDepartment(courseJSONObject.getString("Department"));
-            course.setPrefix(courseJSONObject.getString("Prefix"));
-            course.setNumber(courseJSONObject.getString("Number"));
-            courses.add(course);
-        }
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES);
+
+        Gson gson = gsonBuilder.create();
+
+        Type courseListType = new TypeToken<List<Course>>() {
+        }.getType();
+
+
+        return gson.fromJson(jsonString, courseListType);
+
     }
-
 }

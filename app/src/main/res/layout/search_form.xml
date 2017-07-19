@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="192dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/search_form_collapsingTB"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:theme="@style/ThemeOverlay.AppCompat.Light"
+            app:contentScrim="@color/primary_dark"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/search_form_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <ProgressBar
+        android:id="@+id/search_form_progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/search_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+
+            <Spinner
+                android:id="@+id/prefix_spinner"
+                android:layout_width="125dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="24dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_weight="0.10"
+                android:tag="prefix"
+                app:layout_constraintBottom_toTopOf="@+id/search_form_title_tv"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+
+            <EditText
+                android:id="@+id/search_form_number_tv"
+                android:layout_width="100dp"
+                android:layout_height="48dp"
+
+                android:layout_marginBottom="24dp"
+                android:layout_marginLeft="48dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_weight="0.14"
+                android:hint="@string/number"
+                android:inputType="number"
+                app:layout_constraintBottom_toTopOf="@+id/search_form_title_tv"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toRightOf="@+id/prefix_spinner"
+                app:layout_constraintRight_toRightOf="parent" />
+
+
+            <EditText
+                android:id="@+id/search_form_title_tv"
+                android:layout_width="274dp"
+                android:layout_height="44dp"
+
+                android:layout_marginBottom="24dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:hint="@string/title"
+                android:inputType="text"
+                app:layout_constraintBottom_toTopOf="@+id/search_form_credits_tv"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+
+
+            <EditText
+                android:id="@+id/search_form_credits_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+
+                android:layout_marginBottom="24dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:hint="@string/credits"
+                android:inputType="number"
+                app:layout_constraintBottom_toTopOf="@+id/search_form_search_buttom"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <Button
+                android:id="@+id/search_form_search_buttom"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+
+                android:layout_marginBottom="24dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/lb_search_bar_hint"
+                app:layout_constraintBottom_toTopOf="@+id/editText4"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <Button
+                android:id="@+id/search_form_reset_button"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+
+                android:layout_marginBottom="24dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="48dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="48dp"
+                android:text="@string/reset_form"
+                app:layout_constraintBottom_toTopOf="@+id/editText4"
+                app:layout_constraintHorizontal_bias="0.504"
+                app:layout_constraintLeft_toRightOf="@+id/search_form_search_buttom"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <TextView
+                android:id="@+id/editText3"
+                android:layout_width="126dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="0dp"
+                android:ems="10"
+                android:hint="Prefix"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                app:layout_constraintBottom_toTopOf="@+id/prefix_spinner"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="@+id/prefix_spinner" />
+
+            <EditText
+                android:id="@+id/editText4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="No fields are required to run a search. ANY field may be left blank"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="Course Information"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textColor="@color/accent"
+                app:layout_constraintBottom_toTopOf="@+id/editText3"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>
+
+
+
+

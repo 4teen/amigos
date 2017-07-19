@@ -5,59 +5,72 @@ package com.square.apps.amigos.common.common;
  */
 
 public class Message {
+    private String senderId;
     private String id;
     private String text;
     private String name;
     private String photoUrl;
     private String imageUrl;
 
-    public Message(){
+    public Message() {
     }
 
-    public Message(String text, String name, String photoUrl, String imageUrl){
+    public Message(String senderId, String id, String text, String name, String photoUrl, String imageUrl) {
+        this.senderId = senderId;
+        this.id = id;
         this.text = text;
         this.name = name;
-        this.photoUrl = photoUrl;
+        this.photoUrl = photoUrl; //my profile pic
         this.imageUrl = imageUrl;
     }
 
-    public String getId(){
+    public String getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(String id){
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getPhotoUrl(){
+    public String getPhotoUrl() {
         return photoUrl;
     }
 
-    public void setPhotoUrl(String photoUrl){
+    public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
 
-    public String getText(){
+    public String getText() {
         return text;
     }
 
-    public void setText(String text){
+    public void setText(String text) {
         this.text = text;
     }
 
-    public String getImageUrl(){
+    public String getImageUrl() {
         return imageUrl;
     }
 
-    public void setImageUrl(String imageUrl){
+    public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+
 }

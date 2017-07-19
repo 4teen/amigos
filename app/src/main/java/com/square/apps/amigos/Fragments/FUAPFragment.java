@@ -17,6 +17,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.square.apps.amigos.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * A placeholder fragment containing a simple view. (Forgot User and Password)
  */
@@ -24,12 +27,14 @@ public class FUAPFragment extends Fragment {
 
     private static final String TAG = "FUAPFragment";
 
-    //[END_declare_auth]
-
     //views
-    private EditText email;
+    @BindView(R.id.reset_email_email)
+    EditText email;
 
-    private Snackbar mySnackbar;
+    @BindView(R.id.forgot_password_submit_button)
+    Button submit;
+
+    Snackbar mySnackbar;
 
     public FUAPFragment() {
     }
@@ -39,18 +44,11 @@ public class FUAPFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_fuap, container, false);
-
-        //initialize buttons
-        Button submit = (Button) view.findViewById(R.id.forgot_password_submit_button);
-
-        //initialize views
-        email = (EditText) view.findViewById(R.id.reset_email_email);
+        ButterKnife.bind(this, view);
 
 
         //[START initialize_SnackBar]
-        mySnackbar = Snackbar.make(view.findViewById(R.id.forgotPassword_coordinatingLayout),
-                null, Snackbar.LENGTH_INDEFINITE);
-
+        mySnackbar = Snackbar.make(view, "", Snackbar.LENGTH_INDEFINITE);
         mySnackbar.setAction("Email sent", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +58,6 @@ public class FUAPFragment extends Fragment {
         //[END initialization_SnackBar]
 
         email.setError(null);
-
 
         //[START register_clickListener]
         submit.setOnClickListener(new View.OnClickListener() {

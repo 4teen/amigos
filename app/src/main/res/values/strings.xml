@@ -11,13 +11,6 @@
     <string name="email">Email</string>
     <string name="register">Register</string>
 
-    <string name="subjectTextView">Subject</string>
-    <string name="titleTextView">Title</string>
-    <string name="timeTextView">Time</string>
-
-    <string name="add_friends_title">Add friends</string>
-    <string name="remove_friends_title">Remove friends</string>
-
 
     <string name="search_title">Search</string>
 
@@ -81,39 +74,22 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
-    <string name="title_activity_test">TestActivity</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_fuap">FUAPActivity</string>
     <string name="send">Send</string>
-    <string name="subject">Subject</string>
     <string name="title">Title</string>
-    <string name="college">College</string>
-    <string name="department">Department</string>
-    <string name="section">Section</string>
-    <string name="instructor">Instructor</string>
-    <string name="time">Time</string>
-    <string name="campus">Campus</string>
-    <string name="building">Building</string>
-    <string name="room">Room</string>
-    <string name="friends">friends</string>
-    <string name="term">Term</string>
-    <string name="main_image">Main Image</string>
-    <string name="image_border">Image Border</string>
-    <string name="search_value">Search Value</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="unknown_error">Unknown Error</string>
     <string name="no_internet_connection">No Internet Connection</string>
     <string name="sign_in_cancelled">Singin cancelled</string>
     <string name="unknown_sign_in_response">unknown signin response</string>
     <string name="sign_out_failed">Sing out failed</string>
-    <string name="create_group">OK</string>
     <string name="credits">Credits</string>
     <string name="number">Number</string>
     <string name="reset_form">Reset Form</string>
-    <string name="cancel">CA</string>
+    <string name="group_name">Group Name</string>
+    <string name="create_new_group">CREATE NEW GROUP</string>
+    <string name="title_activity_chat_members">ChatMembersActivity</string>
 
 </resources>

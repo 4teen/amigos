@@ -5,8 +5,10 @@ package com.square.apps.amigos.common.common;
  */
 
 public class User {
+    private String id;
     private String name;
     private String email;
+    private String avatarUrl;
 
     public User() {
     }
@@ -14,6 +16,22 @@ public class User {
     public User(String name, String email) {
         this.name = name;
         this.email = email;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getEmail() {

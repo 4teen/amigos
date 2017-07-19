@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.square.apps.amigos.AppControl;
+import com.google.firebase.auth.FirebaseAuth;
 import com.square.apps.amigos.R;
 
 /**
@@ -25,15 +25,17 @@ public class LauncherActivity extends AppCompatActivity {
         setContentView(R.layout.activity_launcher);
 
         /* Check if user is already logged in or not*/
-        Intent intent = null;
-        if (!AppControl.getInstance(this).is_logged_in()) {
+        Intent intent;
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             if (checkPlayServices()) {// Start IntentService to register this application with GCM.
                 intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
             }
         } else {
             intent = new Intent(this, TabHome.class);
+            startActivity(intent);
         }
-        startActivity(intent);
+
         finish();
 
     }
