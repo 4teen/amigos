@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/ic_perm_identity_black_24dp"
+            android:tint="@color/button_grey"
+            android:title="Profile" />
+        <item
+            android:icon="@drawable/ic_favorite_black_24dp"
+            android:tint="@color/button_grey"
+            android:title="Favorites" />
+        <item
+            android:id="@+id/nav_bookmark"
+            android:icon="@drawable/ic_search_black_24dp"
+            android:tint="@color/button_grey"
+            android:title="Search Course" />
+    </group>
+
+</menu>
