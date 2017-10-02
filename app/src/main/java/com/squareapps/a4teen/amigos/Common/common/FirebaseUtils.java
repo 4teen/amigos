@@ -11,14 +11,14 @@ import com.google.firebase.storage.StorageReference;
 public class FirebaseUtils {
 
 
-    public void setImageView(Uri imageUri, ImageView imageView) {
+    public static void setImageView(Uri imageUri, ImageView imageView) {
         if (imageUri == null) {
             return;
         }
         imageView.setImageURI(imageUri);
     }
 
-    public void setImageView(String url, ImageView imageView) {
+    public static void setImageView(String url, ImageView imageView) {
         if (url == null) {
             return;
         }

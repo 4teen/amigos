@@ -18,7 +18,7 @@ import com.squareapps.a4teen.amigos.R;
 public class LauncherActivity extends AppCompatActivity {
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private static final String TAG = "RegisterActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +54,7 @@ public class LauncherActivity extends AppCompatActivity {
                 apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
                         .show();
             } else {
-                Log.i(TAG, "This device is not supported.");
+                Log.i("LauncherActivity", "This device is not supported.");
                 finish();
             }
             return false;

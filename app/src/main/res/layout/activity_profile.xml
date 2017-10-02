@@ -64,15 +64,15 @@
                 app:srcCompat="@drawable/ic_perm_identity_black_24dp" />
 
             <ImageButton
-                android:id="@+id/profile_accounts_image_button"
+                android:id="@+id/school_image_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginLeft="24dp"
                 android:background="@color/white"
-                app:layout_constraintBottom_toBottomOf="@+id/profile_linked_accounts_text"
+                app:layout_constraintBottom_toBottomOf="@+id/school_edit_text"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:srcCompat="@drawable/ic_account_key_black_24dp" />
+                app:srcCompat="@drawable/ic_school_black_24dp" />
 
             <ImageButton
                 android:id="@+id/profile_cellphone_image_button"
@@ -82,9 +82,9 @@
                 android:layout_marginLeft="24dp"
                 android:layout_marginTop="8dp"
                 android:background="@color/white"
-                app:layout_constraintBottom_toBottomOf="@+id/profile_cellphone_text"
+                app:layout_constraintBottom_toBottomOf="@+id/cellphone_text_view"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/profile_cellphone_text"
+                app:layout_constraintTop_toTopOf="@+id/cellphone_text_view"
                 app:srcCompat="@drawable/ic_phone_android_black_24dp" />
 
             <ImageButton
@@ -95,9 +95,9 @@
                 android:layout_marginLeft="24dp"
                 android:layout_marginTop="8dp"
                 android:background="@color/white"
-                app:layout_constraintBottom_toBottomOf="@+id/profile_gender_text"
+                app:layout_constraintBottom_toBottomOf="@+id/gender_edit_text"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/profile_gender_text"
+                app:layout_constraintTop_toTopOf="@+id/gender_edit_text"
                 app:srcCompat="@drawable/ic_gender_male_female" />
 
             <ImageButton
@@ -108,9 +108,9 @@
                 android:layout_marginLeft="24dp"
                 android:layout_marginTop="8dp"
                 android:background="@color/white"
-                app:layout_constraintBottom_toBottomOf="@+id/profile_birthdate_text"
+                app:layout_constraintBottom_toBottomOf="@+id/birthdate_edit_text"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/profile_birthdate_text"
+                app:layout_constraintTop_toTopOf="@+id/birthdate_edit_text"
                 app:srcCompat="@drawable/ic_cake_black_24dp" />
 
             <EditText
@@ -127,8 +127,8 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <EditText
-                android:id="@+id/profile_birthdate_text"
+            <TextView
+                android:id="@+id/birthdate_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -142,7 +142,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/profile_name_editText" />
 
             <EditText
-                android:id="@+id/profile_linked_accounts_text"
+                android:id="@+id/school_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -152,12 +152,12 @@
                 android:hint="Linked Accounts"
                 android:inputType="textPersonName"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintLeft_toRightOf="@+id/profile_accounts_image_button"
+                app:layout_constraintLeft_toRightOf="@+id/school_image_button"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profile_cellphone_text" />
+                app:layout_constraintTop_toBottomOf="@+id/cellphone_text_view" />
 
-            <EditText
-                android:id="@+id/profile_cellphone_text"
+            <TextView
+                android:id="@+id/cellphone_text_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -168,10 +168,10 @@
                 android:inputType="phone"
                 app:layout_constraintLeft_toRightOf="@+id/profile_cellphone_image_button"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profile_gender_text" />
+                app:layout_constraintTop_toBottomOf="@+id/gender_edit_text" />
 
             <EditText
-                android:id="@+id/profile_gender_text"
+                android:id="@+id/gender_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -183,7 +183,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toRightOf="@+id/profile_gender_image_button"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profile_birthdate_text" />
+                app:layout_constraintTop_toBottomOf="@+id/birthdate_edit_text" />
 
 
         </android.support.constraint.ConstraintLayout>

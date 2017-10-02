@@ -1,7 +1,6 @@
 package com.squareapps.a4teen.amigos.Fragments;
 
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
@@ -35,18 +34,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareapps.a4teen.amigos.Abstract.BaseDialogFragment;
+import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
 import com.squareapps.a4teen.amigos.Activities.ChatMediaActivity;
 import com.squareapps.a4teen.amigos.Activities.ChatMembersActivity;
 import com.squareapps.a4teen.amigos.Activities.LoginActivity;
@@ -54,7 +52,9 @@ import com.squareapps.a4teen.amigos.Activities.SearchUsersActivity;
 import com.squareapps.a4teen.amigos.Common.Objects.Message;
 import com.squareapps.a4teen.amigos.Common.Objects.Photo;
 import com.squareapps.a4teen.amigos.Common.common.FirebaseUtils;
+import com.squareapps.a4teen.amigos.DialogFragments.ChangeNameDialogFragment;
 import com.squareapps.a4teen.amigos.R;
+import com.squareapps.a4teen.amigos.UploadService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -70,16 +70,19 @@ import static android.app.Activity.RESULT_OK;
 import static com.squareapps.a4teen.amigos.Common.Contract.GROUPS;
 import static com.squareapps.a4teen.amigos.Common.Contract.GROUP_ID;
 import static com.squareapps.a4teen.amigos.Common.Contract.GROUP_NAME;
+import static com.squareapps.a4teen.amigos.Common.Contract.IMAGE_URL;
 import static com.squareapps.a4teen.amigos.Common.Contract.MEDIA;
 import static com.squareapps.a4teen.amigos.Common.Contract.MESSAGE;
 import static com.squareapps.a4teen.amigos.Common.Contract.MESSAGES;
 import static com.squareapps.a4teen.amigos.Common.Contract.NAME;
+import static com.squareapps.a4teen.amigos.Common.Contract.PATH;
 import static com.squareapps.a4teen.amigos.Common.Contract.TIMESTAMP;
 import static com.squareapps.a4teen.amigos.Fragments.SearchCourseResultsFragment.USERS;
+import static com.squareapps.a4teen.amigos.UploadService.EXTRA_FILE_URI;
 import static java.io.File.separator;
 
 
-public class ChatFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener {
+public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
 
     private static final String LOADING_IMAGE_URL = "https://www.google.com/images/spin-32.gif";
@@ -223,43 +226,10 @@ public class ChatFragment extends Fragment implements GoogleApiClient.OnConnecti
             public void afterTextChanged(Editable editable) {
             }
         });
-        //[END initialize_mMesageEditText_TextWatcher]
 
-        //[START initiliaze_mSendButton]
-        mSendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        mSendButton.setOnClickListener(this);
+        mAddMessageImageView.setOnClickListener(this);
 
-                final Message friendlyMessage = new Message(mUid,
-                        null,
-                        mMessageEditText.getText().toString(),
-                        mUsername,
-                        mPhotoUrl,
-                        null /* no image */);
-
-                sendMessage(friendlyMessage);
-
-                mMessageEditText.setText("");
-            }
-        });
-        //[END initiliaze_mSendButton]
-
-        //[START initiliaze_AddMessageImageView]
-        mAddMessageImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                // Select image for image message on click.
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("image/*");
-                startActivityForResult(intent, REQUEST_IMAGE);
-            }
-        });
-        //[END initiliaze_AddMessageImageView]
-
-        //[START initialize_firebase_Adapter]
-        // New child entries
         mFirebaseAdapter = new FirebaseRecyclerAdapter<Message, MessageViewHolder>
                 (Message.class,
                         R.layout.activity_chat_list_item, //layout
@@ -280,7 +250,7 @@ public class ChatFragment extends Fragment implements GoogleApiClient.OnConnecti
                     viewHolder.messageImageView.setVisibility(ImageView.GONE);
                 } else {
 
-                    firebaseUtils.setImageView(model.getImageUrl(), viewHolder.messageImageView);
+                    FirebaseUtils.setImageView(model.getImageUrl(), viewHolder.messageImageView);
 
                     viewHolder.messageTextView.setVisibility(TextView.GONE);
                     viewHolder.messageImageView.setVisibility(ImageView.VISIBLE);
@@ -290,7 +260,7 @@ public class ChatFragment extends Fragment implements GoogleApiClient.OnConnecti
                 //populate name of sender
                 viewHolder.messengerTextView.setText(model.getName());
 
-                firebaseUtils.setImageView(model.getPhotoUrl(), viewHolder.messengerImageView);
+                FirebaseUtils.setImageView(model.getPhotoUrl(), viewHolder.messengerImageView);
 
             }
             //[END_PopulateViewHolder]
@@ -365,6 +335,7 @@ public class ChatFragment extends Fragment implements GoogleApiClient.OnConnecti
         message.setId(messageId);
 
         HashMap<String, Object> map = new HashMap<>();
+
         map.put(MESSAGES + separator + groupID + separator + messageId, message);
         map.put(USERS + separator + mUid + separator + MESSAGES + separator + messageId + separator + groupID, true);
         map.put(GROUPS + separator + groupID + separator + MESSAGE, mUsername + ": " + message.getText());
@@ -374,6 +345,40 @@ public class ChatFragment extends Fragment implements GoogleApiClient.OnConnecti
 
     }
 
+    public void sendPhoto(final Uri data) {
+        Photo photo = new Photo(null, getUid(), groupID);
+
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
+        Date date = new Date();
+
+        String photoId = mFirebaseDatabaseReference
+                .child(MEDIA)
+                .child(groupID)
+                .push().getKey();
+
+        photo.setId(photoId);
+        photo.setTimeStamp(dateFormat.format(date));
+
+        Message tempMessage = new Message(
+                mUid,
+                null,
+                null,
+                mUsername,
+                mPhotoUrl,
+                LOADING_IMAGE_URL);
+
+        sendMessage(tempMessage);
+
+        String update1 = MESSAGES + separator + groupID + separator + tempMessage.getId() + separator + IMAGE_URL;
+        String update2 = MEDIA + separator + groupID + photo.getId() + IMAGE_URL;
+
+        Bundle bundle = new Bundle();
+        bundle.putString(PATH, MEDIA + separator + groupID + photo.getId());
+        bundle.putParcelable(EXTRA_FILE_URI, data);
+        UploadService.startActionUpload(getContext(), bundle);
+
+
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -385,49 +390,13 @@ public class ChatFragment extends Fragment implements GoogleApiClient.OnConnecti
             case REQUEST_IMAGE:
                 if (data != null) {
                     final Uri uri = data.getData();
-
-                    String messageId = mFirebaseDatabaseReference
-                            .child(MESSAGES)
-                            .child(groupID)
-                            .push().getKey();
-
-                    Message tempMessage = new Message(
-                            mUid,
-                            messageId,
-                            null,
-                            mUsername,
-                            mPhotoUrl,
-                            LOADING_IMAGE_URL);
-
-                    mFirebaseDatabaseReference
-                            .child(MESSAGES)
-                            .child(groupID)
-                            .child(messageId)
-                            .setValue(tempMessage, new DatabaseReference.CompletionListener() {
-                                @Override
-                                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                    if (databaseError == null) {
-                                        String key = databaseReference.getKey();
-
-                                        StorageReference storageReference = FirebaseStorage
-                                                .getInstance()
-                                                .getReference(mFirebaseUser.getUid())
-                                                .child(key)
-                                                .child(uri.getLastPathSegment());
-
-                                        putImageInStorage(storageReference, uri, key);
-
-                                    } else {
-                                        Log.w(TAG, "Unable to write " + MESSAGE + " to database.", databaseError.toException());
-                                    }
-                                }
-                            });
+                    sendPhoto(uri);
 
                 }
                 break;
             case REQUEST_CHANGE_NAME:
                 String groupName = data
-                        .getSerializableExtra(ChangeNameDialogFragment.EXTRA_CHANGE_NAME)
+                        .getSerializableExtra(BaseDialogFragment.EXTRA1)
                         .toString();
 
                 if (groupName != null) {
@@ -450,37 +419,6 @@ public class ChatFragment extends Fragment implements GoogleApiClient.OnConnecti
         mFirebaseAdapter.notifyDataSetChanged();
     }
 
-    private void putImageInStorage(StorageReference storageReference, Uri uri, final String key) {
-        storageReference
-                .putFile(uri)
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            String imageUrl = task.getResult().getMetadata()
-                                    .getDownloadUrl()
-                                    .toString();
-
-                            Photo photoItem = new Photo(imageUrl, mUid, groupID);
-                            mFirebaseDatabaseReference.child(MEDIA).child(groupID).child(key).setValue(photoItem);
-
-                            HashMap<String, Object> map = new HashMap<>();
-                            map.put(MESSAGES + separator + groupID + separator + key + separator + "imageUrl", imageUrl);
-                            map.put(USERS + separator + mUid + separator + MESSAGES + separator + key + separator + groupID, true);
-                            updateDataSet(map);
-
-                        } else {
-                            Log.w(TAG, "Image upload task was not successful.", task.getException());
-                        }
-                    }
-                });
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -536,6 +474,34 @@ public class ChatFragment extends Fragment implements GoogleApiClient.OnConnecti
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.sendButton:
+                final Message friendlyMessage = new Message(mUid,
+                        null,
+                        mMessageEditText.getText().toString(),
+                        mUsername,
+                        mPhotoUrl,
+                        null /* no image */);
+
+                sendMessage(friendlyMessage);
+
+                mMessageEditText.setText("");
+                break;
+            case R.id.addMessageImageView:
+                // Select image for image message on click.
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*");
+                startActivityForResult(intent, REQUEST_IMAGE);
+                break;
+
+
+        }
+
     }
 
 

@@ -8,6 +8,8 @@ public class Photo {
     private String photoUrl;
     private String owner;
     private String groupId;
+    private String id;
+    private String timeStamp;
 
     public Photo() {
     }
@@ -16,6 +18,22 @@ public class Photo {
         this.photoUrl = photoUrl;
         this.owner = owner;
         this.groupId = groupId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public String getPhotoUrl() {
@@ -40,5 +58,9 @@ public class Photo {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getPhotoFilename() {
+        return "IMG_" + getClass().toString()+ ".jpg";
     }
 }

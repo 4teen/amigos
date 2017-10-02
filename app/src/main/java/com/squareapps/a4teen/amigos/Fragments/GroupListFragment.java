@@ -27,9 +27,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import com.squareapps.a4teen.amigos.Abstract.BaseDialogFragment;
+import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
 import com.squareapps.a4teen.amigos.Activities.ChatActivity;
 import com.squareapps.a4teen.amigos.Activities.LoginActivity;
 import com.squareapps.a4teen.amigos.Common.Objects.Group;
+import com.squareapps.a4teen.amigos.DialogFragments.AddGroupDialogFragment;
 import com.squareapps.a4teen.amigos.R;
 
 import java.util.HashMap;
@@ -42,12 +45,13 @@ import static com.squareapps.a4teen.amigos.Common.Contract.GROUP_ID;
 import static com.squareapps.a4teen.amigos.Common.Contract.GROUP_NAME;
 import static com.squareapps.a4teen.amigos.Common.Contract.MEMBERS;
 import static com.squareapps.a4teen.amigos.Common.Contract.USERS;
+import static java.io.File.separator;
 
 /**
  * Created by y-pol on 6/30/2017.
  */
 
-public class GroupListFragment extends Fragment {
+public class GroupListFragment extends FragmentBase {
 
     public static final String ARGS = "args";
     public static final String TAG = "GroupListFragment";
@@ -69,16 +73,6 @@ public class GroupListFragment extends Fragment {
         view.getContext().startActivity(i);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (user == null) {
-            // Not signed in, launch the Sign In activity
-            startActivity(new Intent(getActivity(), LoginActivity.class));
-            getActivity().finish();
-        }
-
-    }
 
     @Override
     public void onDestroy() {
@@ -91,13 +85,7 @@ public class GroupListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
-
-        FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
-        user = mFirebaseAuth.getCurrentUser();
-
-        databaseReference = FirebaseDatabase
-                .getInstance()
-                .getReference();
+        databaseReference = getDataRef();
 
     }
 
@@ -106,14 +94,13 @@ public class GroupListFragment extends Fragment {
         View view = inflater.inflate(R.layout.group_list_recycler_view, container, false);
         ButterKnife.bind(this, view);
 
-        //[START initialize_recycler_view]
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //[END initialize_recycler_view]
 
         groupRecyclerAdapter = new FirebaseIndexRecyclerAdapter<Group, GroupViewHolder>(Group.class,
                 R.layout.main_list_item,
                 GroupViewHolder.class,
-                databaseReference.child(USERS).child(user.getUid()).child(GROUPS),
+                databaseReference.child(USERS).child(getUid()).child(GROUPS),
                 databaseReference.child(GROUPS)
         ) {
             @Override
@@ -134,7 +121,7 @@ public class GroupListFragment extends Fragment {
 
         if (requestCode == REQUEST_GROUP) {
             String groupName = data
-                    .getSerializableExtra(AddGroupDialogFragment.EXTRA_ADD_GROUP)
+                    .getSerializableExtra(BaseDialogFragment.EXTRA1)
                     .toString();
 
             if (groupName != null) {
@@ -147,8 +134,8 @@ public class GroupListFragment extends Fragment {
                             @Override
                             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                                 HashMap<String, Object> groupsMap = new HashMap<>();
-                                groupsMap.put(MEMBERS + "/" + key + "/" + user.getUid(), true);
-                                groupsMap.put(USERS + "/" + user.getUid() + "/" + GROUPS + "/" + key, true);
+                                groupsMap.put(MEMBERS + separator + key + separator + getUid(), true);
+                                groupsMap.put(USERS + separator + getUid() + separator + GROUPS + separator + key, true);
                                 updateDataSet(groupsMap);
 
                             }
@@ -194,9 +181,9 @@ public class GroupListFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.delete_group_context_menu:
                 HashMap<String, Object> map = new HashMap<>();
-                map.put(USERS + "/" + user.getUid() + "/" + GROUPS + "/" + group.getGroupId(), null);
-                map.put(GROUPS + "/" + group.getGroupId(), null);
-                map.put(MEMBERS + "/" + group.getGroupId(), null);
+                map.put(USERS + separator + getUid() + separator + GROUPS + separator + group.getGroupId(), null);
+                map.put(GROUPS + separator + group.getGroupId(), null);
+                map.put(MEMBERS + separator + group.getGroupId(), null);
                 updateDataSet(map);
                 return true;
             default:

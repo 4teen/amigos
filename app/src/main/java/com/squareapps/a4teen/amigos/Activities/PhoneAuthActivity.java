@@ -4,15 +4,16 @@ import android.app.Fragment;
 import android.support.annotation.NonNull;
 
 import com.squareapps.a4teen.amigos.Abstract.SingleFragmentActivity;
-import com.squareapps.a4teen.amigos.Fragments.FUAPFragment;
+import com.squareapps.a4teen.amigos.Fragments.PhoneAuthFragment;
 
+/**
+ * Created by y-pol on 9/30/2017.
+ */
 
-public class FUAPActivity extends SingleFragmentActivity {
+public class PhoneAuthActivity extends SingleFragmentActivity {
     @NonNull
     @Override
     protected Fragment createFragment() {
-        return new FUAPFragment();
+        return PhoneAuthFragment.newInstance(getIntent().getExtras());
     }
-
-
 }

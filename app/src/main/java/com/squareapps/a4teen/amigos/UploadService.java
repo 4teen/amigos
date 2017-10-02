@@ -1,65 +1,130 @@
 package com.squareapps.a4teen.amigos;
 
-import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareapps.a4teen.amigos.Abstract.BaseTaskService;
+
+import static com.squareapps.a4teen.amigos.Common.Contract.PATH;
 
 
-public class UploadService extends IntentService {
+public class UploadService extends BaseTaskService {
 
-    private static final String ACTION_FOO = "com.squareapps.a4teen.amigos.action.FOO";
-    private static final String ACTION_BAZ = "com.squareapps.a4teen.amigos.action.BAZ";
+    private static final String TAG = "MyUploadService";
 
+    /**
+     * Intent Actions
+     **/
+    public static final String ACTION_UPLOAD = "action_upload";
+    public static final String UPLOAD_COMPLETED = "upload_completed";
+    public static final String UPLOAD_ERROR = "upload_error";
 
-    private static final String EXTRA_PARAM1 = "com.squareapps.a4teen.amigos.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.squareapps.a4teen.amigos.extra.PARAM2";
+    /**
+     * Intent Extras
+     **/
+    public static final String EXTRA_FILE_URI = "extra_file_uri";
+    public static final String EXTRA_DOWNLOAD_URL = "extra_download_url";
+
 
     public UploadService() {
-        super("UploadService");
+        super(TAG);
     }
 
 
-    public static void startActionUpload(Context context, String param1, String param2) {
+    public static void startActionUpload(Context context, Bundle bundle) {
         Intent intent = new Intent(context, UploadService.class);
-        intent.setAction(ACTION_FOO);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
+        intent.setAction(ACTION_UPLOAD);
+        intent.putExtras(bundle);
         context.startService(intent);
     }
 
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, UploadService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleIntent(@Nullable Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_FOO.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionFoo(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
+            if (ACTION_UPLOAD.equals(action)) {
+                handleActionUpload(intent);
             }
         }
     }
 
 
-    private void handleActionFoo(String param1, String param2) {
+    private void handleActionUpload(Intent intent) {
+        Uri fileUri = intent.getExtras().getParcelable(EXTRA_FILE_URI);
+        String path = intent.getExtras().getString(PATH);
+        uploadFromUri(fileUri, path);
+    }
 
-        throw new UnsupportedOperationException("Not yet implemented");
+    private void uploadFromUri(final Uri fileUri, final String path) {
+
+        showProgressNotification(getString(R.string.app_name), 0, 0);
+
+        final StorageReference photoRef = getStorageRef().child(path)
+                .child(fileUri.getLastPathSegment());
+
+        photoRef.putFile(fileUri).
+                addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        showProgressNotification(getString(R.string.send),
+                                taskSnapshot.getBytesTransferred(),
+                                taskSnapshot.getTotalByteCount());
+                    }
+                })
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get the public download URL
+                        String downloadUrl = taskSnapshot.getStorage().toString();
+                        broadcastUploadFinished(downloadUrl, fileUri);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        broadcastUploadFinished(null, fileUri);
+
+                    }
+                });
+    }
+    // [END upload_from_uri]
+
+    /**
+     * Broadcast finished upload (success or failure).
+     *
+     * @return true if a running receiver received the broadcast.
+     */
+    private boolean broadcastUploadFinished(String downloadUrl, @Nullable Uri fileUri) {
+        boolean success = downloadUrl != null;
+
+        String action = success ? UPLOAD_COMPLETED : UPLOAD_ERROR;
+
+        Intent broadcast = new Intent(action)
+                .putExtra(EXTRA_DOWNLOAD_URL, downloadUrl)
+                .putExtra(EXTRA_FILE_URI, fileUri);
+        return LocalBroadcastManager.getInstance(getApplicationContext())
+                .sendBroadcast(broadcast);
     }
 
 
-    private void handleActionBaz(String param1, String param2) {
+    public static IntentFilter getIntentFilter() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(UPLOAD_COMPLETED);
+        filter.addAction(UPLOAD_ERROR);
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        return filter;
     }
+
 }

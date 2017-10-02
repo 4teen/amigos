@@ -15,10 +15,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
-import com.squareapps.a4teen.amigos.Activities.FUAPActivity;
 import com.squareapps.a4teen.amigos.Activities.LoginActivity;
 import com.squareapps.a4teen.amigos.Activities.MainActivity;
-import com.squareapps.a4teen.amigos.Activities.RegisterActivity;
 import com.squareapps.a4teen.amigos.R;
 
 import java.util.Arrays;
@@ -34,7 +32,7 @@ import static java.io.File.separator;
  */
 
 
-public class LoginFragment extends FragmentBase implements View.OnClickListener {
+public class LoginFragment extends FragmentBase {
 
     //Private statics Constants
     private static final int RC_SIGN_IN = 9001;
@@ -129,26 +127,6 @@ public class LoginFragment extends FragmentBase implements View.OnClickListener 
         startActivity(i);
         getActivity().finish();
 
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.sign_up_tv_id:
-                Intent i = new Intent(getActivity(), RegisterActivity.class);
-                startActivity(i);
-                getActivity().finish();
-                return;
-            case R.id.sign_in_button:
-                initGoogleSigning();
-                return;
-            case R.id.forgot_password_tv:
-                Intent fuabIntent = new Intent(getActivity(), FUAPActivity.class);
-                startActivity(fuabIntent);
-            default:
-                return;
-
-        }
     }
 
     private void onAuthSuccess(final FirebaseUser user) {
