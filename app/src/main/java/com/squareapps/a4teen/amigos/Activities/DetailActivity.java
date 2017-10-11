@@ -11,5 +11,4 @@ public class DetailActivity extends SingleFragmentActivity {
         return CourseFragment.newInstance(getIntent().getStringExtra(COURSEID));
     }
 
-
 }

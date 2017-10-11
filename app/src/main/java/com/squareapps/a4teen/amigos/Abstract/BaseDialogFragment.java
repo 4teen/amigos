@@ -11,9 +11,7 @@ import android.widget.TextView;
 
 import com.squareapps.a4teen.amigos.R;
 
-/**
- * Created by y-pol on 9/26/2017.
- */
+
 
 public abstract class BaseDialogFragment extends DialogFragment {
 

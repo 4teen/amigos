@@ -1,8 +1,5 @@
 package com.squareapps.a4teen.amigos.Common.Objects;
 
-/**
- * Created by y-pol on 7/18/2017.
- */
 
 public class Photo {
     private String photoUrl;
@@ -14,10 +11,11 @@ public class Photo {
     public Photo() {
     }
 
-    public Photo(String photoUrl, String owner, String groupId) {
+    public Photo(String photoUrl, String owner, String groupId, String id) {
         this.photoUrl = photoUrl;
         this.owner = owner;
         this.groupId = groupId;
+        this.id = id;
     }
 
     public String getId() {

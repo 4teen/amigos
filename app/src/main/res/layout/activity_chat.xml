@@ -16,8 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:minHeight="?attr/actionBarSize">
 
             <android.support.design.widget.AppBarLayout
                 android:layout_width="match_parent"
@@ -28,7 +27,7 @@
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/chat_toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="72dp"
+                    android:layout_height="?attr/actionBarSize"
                     android:theme="@style/ThemeOverlay.AppCompat.Light" />
 
             </android.support.design.widget.AppBarLayout>
@@ -75,7 +74,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:inputType="text" />
 
             <Button
                 android:id="@+id/sendButton"
@@ -83,7 +83,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:enabled="false"
-                android:text="SEND" />
+                android:text="@string/send" />
 
         </LinearLayout>
 

@@ -3,9 +3,6 @@
     <!-- Base application theme. -->
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
 
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
@@ -24,15 +21,20 @@
 
 
     <!-- Dark Buttons -->
-    <style name="ThemeOverlay.MyDarkButton" parent="ThemeOverlay.AppCompat.Dark">
+    <style name="ThemeOverlay.MyDarkButton" parent="Base.Widget.AppCompat.ButtonBar">
         <item name="colorButtonNormal">@color/accent</item>
         <item name="android:layout_marginRight">4dp</item>
         <item name="android:layout_marginLeft">4dp</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <!-- -->
+    <style name="AppTheme.NavHeader" parent="AppTheme.Base">
+        <item name="android:background">@color/primary_dark</item>
+    </style>
+
     <!-- Light EditTexts -->
-    <style name="ThemeOverlay.MyLightEditText" parent="ThemeOverlay.AppCompat.Dark"/>
+    <style name="ThemeOverlay.MyLightEditText" parent="ThemeOverlay.AppCompat.Dark" />
 
     <style name="ThemeOverlay.MyTextDetail" parent="AppTheme">
         <item name="android:layout_width">wrap_content</item>
@@ -46,8 +48,8 @@
     </style>
 
     <style name="ThemeOverlay.FirebaseIcon" parent="AppTheme">
-        <item name="android:layout_marginTop">@dimen/icon_top_margin</item>
-        <item name="android:layout_marginBottom">@dimen/icon_bottom_margin</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">16dp</item>
     </style>
 
     <style name="ThemeOverlay.MyTitleText" parent="AppTheme">
@@ -55,5 +57,16 @@
         <item name="android:textSize">36sp</item>
     </style>
 
+    <style name="AppTheme.TableRow.Left" parent="AppTheme">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.TableRow.Right" parent="AppTheme">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:textColor">@color/primary_text</item>
+    </style>
 
 </resources>

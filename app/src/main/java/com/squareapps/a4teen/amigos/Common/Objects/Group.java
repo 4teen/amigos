@@ -5,9 +5,7 @@ import com.google.firebase.database.Exclude;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by y-pol on 6/30/2017.
- */
+
 
 public class Group {
     private String groupId;
@@ -15,6 +13,7 @@ public class Group {
     private String owner;
     private String message;
     private String timestamp;
+    private String avatarUrl;
 
     public Group() {
 
@@ -24,6 +23,14 @@ public class Group {
         this.name = name;
         this.owner = owner;
         this.groupId = groupId;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public String getOwner() {

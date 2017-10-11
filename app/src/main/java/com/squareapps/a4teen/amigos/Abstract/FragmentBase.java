@@ -8,7 +8,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
+import android.support.graphics.drawable.VectorDrawableCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -24,16 +28,36 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareapps.a4teen.amigos.Fragments.LoginFragment;
+import com.squareapps.a4teen.amigos.R;
 
 import static com.squareapps.a4teen.amigos.Common.Contract.AVATAR_URL;
 
-/**
- * Created by y-pol on 9/24/2017.
- */
 
 public abstract class FragmentBase extends Fragment {
 
     private View myView;
+
+
+    public ActionBar setToolbar(Toolbar toolbar, int res) {
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+
+        // Adding menu icon to Toolbar
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            VectorDrawableCompat indicator
+                    = VectorDrawableCompat.create(getResources(), res, getActivity().getTheme());
+            assert indicator != null;
+            indicator
+                    .setTint(ResourcesCompat.getColor(getResources(), R.color.white, getActivity().getTheme()));
+
+            supportActionBar.setHomeAsUpIndicator(indicator);
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        return supportActionBar;
+    }
+
 
     @Nullable
     public String getAvatarUrl() {

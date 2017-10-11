@@ -1,6 +1,5 @@
 package com.squareapps.a4teen.amigos.Fragments;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,34 +8,30 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
+import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
 import com.squareapps.a4teen.amigos.Common.Objects.Photo;
-import com.squareapps.a4teen.amigos.Common.common.FirebaseUtils;
 import com.squareapps.a4teen.amigos.R;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import de.hdodenhof.circleimageview.CircleImageView;
+import com.squareapps.a4teen.amigos.ViewHolders.MediaHolder;
 
 import static com.squareapps.a4teen.amigos.Common.Contract.MEDIA;
 
 
-public class ChatMediaFragment extends Fragment {
+public class ChatMediaFragment extends FragmentBase {
 
-    public static final String TAG = "ChatMediaFragment";
     public static final String PARAM1 = "param1";
-    @BindView(R.id.group_list_recycler_View)
-    RecyclerView recyclerView;
-    private FirebaseUser user;
+
     private DatabaseReference databaseReference;
-    private FirebaseRecyclerAdapter<Photo, PhotoViewHolder> myRecyclerAdapter;
+    private FirebaseRecyclerAdapter<Photo, MediaHolder> myRecyclerAdapter;
     private String groupId;
 
     public ChatMediaFragment() {
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        myRecyclerAdapter.cleanup();
     }
 
     public static ChatMediaFragment newInstance(String param) {
@@ -55,8 +50,8 @@ public class ChatMediaFragment extends Fragment {
             groupId = getArguments().getString(PARAM1);
         }
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+
+        databaseReference = getDataRef();
 
     }
 
@@ -64,44 +59,22 @@ public class ChatMediaFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_chat_members, container, false);
-        ButterKnife.bind(this, view);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.group_list_recycler_View);
 
-
-        myRecyclerAdapter = new FirebaseRecyclerAdapter<Photo, PhotoViewHolder>(Photo.class,
-                R.layout.circle_image_view,
-                PhotoViewHolder.class,
+        myRecyclerAdapter = new FirebaseRecyclerAdapter<Photo, MediaHolder>(Photo.class,
+                R.layout.image_view_object,
+                MediaHolder.class,
                 databaseReference.child(MEDIA).child(groupId)) {
             @Override
-            protected void populateViewHolder(PhotoViewHolder viewHolder, Photo model, int position) {
+            protected void populateViewHolder(MediaHolder viewHolder, Photo model, int position) {
                 viewHolder.bind(model);
-
             }
         };
 
-        recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 2));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         recyclerView.setAdapter(myRecyclerAdapter);
 
         return view;
     }
 
-    public static class PhotoViewHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.circleImageView)
-        CircleImageView imageView;
-        String photoUrl;
-        String owner;
-
-        public PhotoViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        public void bind(Photo model) {
-            photoUrl = model.getPhotoUrl();
-            owner = model.getOwner();
-            new FirebaseUtils().setImageView(photoUrl, imageView);
-
-        }
-
-    }
 }

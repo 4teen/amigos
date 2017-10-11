@@ -23,15 +23,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by y-pol on 6/24/2017.
- */
 
 public class CourseFetchr {
     public static final String PATH = "http://ec2-54-205-151-150.compute-1.amazonaws.com";
     public static final String ENCODED_PATH = "amigosApp/amigos_login_api/getCourses.php";
     private static final String TAG = "CourseFetchr";
-    private static final String API_KEY = "REPLACE_ME_WITH_A_REAL_KEY";
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);

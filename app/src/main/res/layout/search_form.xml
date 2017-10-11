@@ -157,7 +157,7 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="@+id/prefix_spinner" />
 
-            <EditText
+            <TextView
                 android:id="@+id/editText4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -165,7 +165,6 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:ems="10"
-                android:inputType="textPersonName"
                 android:text="No fields are required to run a search. ANY field may be left blank"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                 app:layout_constraintBottom_toBottomOf="parent"

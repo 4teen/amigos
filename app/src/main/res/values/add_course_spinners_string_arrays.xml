@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="prefix_Item_array">
-        <item name=""></item>
+        <item name="" />
         <item name="ACG">ACG</item>
         <item name="ADE">ADE</item>
         <item name="ADV">ADV</item>

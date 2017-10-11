@@ -99,6 +99,7 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        assert sqLiteHandler != null;
         SQLiteDatabase db = sqLiteHandler.getWritableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
@@ -140,6 +141,7 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, @NonNull ContentValues values) {
+        assert sqLiteHandler != null;
         SQLiteDatabase db = sqLiteHandler.getWritableDatabase();
         long id;
         switch (uriMatcher.match(uri)) {
@@ -191,6 +193,7 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
+        assert sqLiteHandler != null;
         SQLiteDatabase db = sqLiteHandler.getWritableDatabase();
 
         int count;
@@ -229,6 +232,7 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        assert sqLiteHandler != null;
         SQLiteDatabase db = sqLiteHandler.getWritableDatabase();
 
         int count;

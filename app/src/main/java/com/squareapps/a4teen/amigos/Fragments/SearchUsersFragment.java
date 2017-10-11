@@ -1,14 +1,12 @@
 package com.squareapps.a4teen.amigos.Fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -23,9 +21,9 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
 import com.squareapps.a4teen.amigos.Common.Objects.User;
 import com.squareapps.a4teen.amigos.R;
 
@@ -41,7 +39,7 @@ import static com.squareapps.a4teen.amigos.Common.Contract.MEMBERS;
 import static com.squareapps.a4teen.amigos.Common.Contract.USERS;
 import static java.io.File.separator;
 
-public class SearchUsersFragment extends Fragment {
+public class SearchUsersFragment extends FragmentBase {
 
 
     private static ActionMode mActionMode;
@@ -73,7 +71,7 @@ public class SearchUsersFragment extends Fragment {
         setHasOptionsMenu(true);
 
         groupID = getArguments().getSerializable(GROUP_ID).toString();
-        myDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        myDatabaseReference = getDataRef();
 
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setStackFromEnd(true);
@@ -85,7 +83,7 @@ public class SearchUsersFragment extends Fragment {
         View view = inflater.inflate(R.layout.search_friends_activity, container, false);
         ButterKnife.bind(this, view);
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        setToolbar(toolbar, R.drawable.ic_arrow_back_black_24dp);
         setupRecyclerAdapter(null);
 
         return view;
@@ -125,15 +123,6 @@ public class SearchUsersFragment extends Fragment {
                 UserViewHolder.class,
                 myDatabaseReference.child(USERS).orderByChild(EMAIL).equalTo(query)
         ) {
-
-            @Override
-            protected User parseSnapshot(DataSnapshot snapshot) {
-                User user1 = super.parseSnapshot(snapshot);
-                if (user1 != null) {
-                    user1.setId(snapshot.getKey());
-                }
-                return user1;
-            }
 
             @Override
             protected void populateViewHolder(UserViewHolder viewHolder, User model, int position) {
@@ -222,7 +211,7 @@ public class SearchUsersFragment extends Fragment {
         }
 
         private void updateDatabase() {
-            HashMap<String, Object> map = new HashMap<String, Object>();
+            HashMap<String, Object> map = new HashMap<>();
             map.put(MEMBERS + separator + groupID + separator + userID, true);
             map.put(USERS + separator + userID + separator + GROUPS + separator + groupID, true);
             databaseReference.updateChildren(map);

@@ -4,7 +4,6 @@ package com.squareapps.a4teen.amigos.Common.Objects;
 import com.google.firebase.database.Exclude;
 import com.google.gson.annotations.SerializedName;
 
-
 import java.util.HashMap;
 
 import static com.squareapps.a4teen.amigos.Common.Contract.COLLEGE;
@@ -22,10 +21,6 @@ import static com.squareapps.a4teen.amigos.Common.Contract.PREFIX;
 import static com.squareapps.a4teen.amigos.Common.Contract.PREREQUISITES;
 import static com.squareapps.a4teen.amigos.Common.Contract.TITLE;
 
-
-/**
- * Created by YOEL on 9/12/2015.
- */
 
 public class Course {
 
@@ -196,6 +191,10 @@ public class Course {
         map.put(path + CO_PREREQUISITES, coPrerequisites);
         map.put(path + COURSE_REQUIREMENTS, courseRequirements);
         return map;
+    }
+
+    public String getCode() {
+        return prefix + number;
     }
 
 }

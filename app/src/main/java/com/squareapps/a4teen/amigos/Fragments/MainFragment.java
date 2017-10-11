@@ -1,4 +1,4 @@
-package com.squareapps.a4teen.amigos.Activities;
+package com.squareapps.a4teen.amigos.Fragments;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -10,14 +10,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v13.app.FragmentStatePagerAdapter;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,16 +23,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
+import com.squareapps.a4teen.amigos.Activities.LoginActivity;
+import com.squareapps.a4teen.amigos.Activities.ProfileActivity;
+import com.squareapps.a4teen.amigos.Activities.SearchFormActivity;
+import com.squareapps.a4teen.amigos.Activities.SettingsActivity;
 import com.squareapps.a4teen.amigos.Common.Contract;
-import com.squareapps.a4teen.amigos.Fragments.CourseListFragment;
-import com.squareapps.a4teen.amigos.Fragments.GroupListFragment;
-import com.squareapps.a4teen.amigos.Fragments.SearchFormFragment;
 import com.squareapps.a4teen.amigos.R;
 
 import java.util.ArrayList;
@@ -62,8 +57,6 @@ public class MainFragment extends FragmentBase {// Declare the constants
     @BindView(R.id.tabHomeFAB)
     FloatingActionButton fab;
     SectionsPagerAdapter adapter;// Firebase instance variables
-    FirebaseAuth mFirebaseAuth;
-    FirebaseUser mFirebaseUser;
 
     public static MainFragment newInstance(Bundle b) {
 
@@ -76,7 +69,7 @@ public class MainFragment extends FragmentBase {// Declare the constants
     @Override
     public void onStart() {
         super.onStart();
-        if (mFirebaseUser == null) {
+        if (getUser() == null) {
             // Not signed in, launch the Sign In activity
             getActivity().startActivity(new Intent(null, LoginActivity.class));
             getActivity().finish();
@@ -86,11 +79,6 @@ public class MainFragment extends FragmentBase {// Declare the constants
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        // Initialize Firebase Auth
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
-
-
     }
 
 
@@ -101,19 +89,7 @@ public class MainFragment extends FragmentBase {// Declare the constants
         View v = inflater.inflate(R.layout.activity_tab_home, container, false);
         ButterKnife.bind(this, v);
 
-
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
-        // Adding menu icon to Toolbar
-        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (supportActionBar != null) {
-            VectorDrawableCompat indicator
-                    = VectorDrawableCompat.create(getActivity().getResources(), R.drawable.ic_menu_black_24dp, getActivity().getTheme());
-            indicator.setTint(ResourcesCompat.getColor(getActivity().getResources(), R.color.white, getActivity().getTheme()));
-            supportActionBar.setHomeAsUpIndicator(indicator);
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
+        setToolbar(toolbar, R.drawable.ic_menu_black_24dp);
 
         setupViewPager(mViewPager);
         tabLayout.setupWithViewPager(mViewPager);
@@ -234,8 +210,8 @@ public class MainFragment extends FragmentBase {// Declare the constants
      * one of the sections/tabs/pages.
      */
     static class SectionsPagerAdapter extends FragmentStatePagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<Fragment>();
-        private final List<String> mFragmentTitleList = new ArrayList<String>();
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);

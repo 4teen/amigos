@@ -45,8 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|bottom"
-            android:layout_marginBottom="@dimen/md_keylines"
-            android:layout_marginRight="@dimen/md_keylines"
+          android:layout_margin="2dp"
             android:tint="@color/white"
             app:srcCompat="@android:drawable/btn_star"/>
     </android.support.design.widget.CoordinatorLayout>

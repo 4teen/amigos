@@ -27,16 +27,10 @@ import static com.squareapps.a4teen.amigos.Common.Contract.NAME;
 import static com.squareapps.a4teen.amigos.Common.Contract.USERS;
 import static java.io.File.separator;
 
-/**
- * Created by YOEL on 10/22/2015.
- */
-
-
 public class LoginFragment extends FragmentBase {
 
     //Private statics Constants
     private static final int RC_SIGN_IN = 9001;
-    private static final String TAG = "EmailPassword";
 
     View view;
 

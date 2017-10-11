@@ -37,7 +37,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         /*gets instance of fragment manager**/
         FragmentManager supportFragmentManager = getFragmentManager();
 
-        /**Fragment transaction******
+        /*Fragment transaction******
          ask Fragment manager for the Course fragment with the container view ID of R.id.fragmentContainer
          if this fragment is already in the list, the FM will return it.
          */

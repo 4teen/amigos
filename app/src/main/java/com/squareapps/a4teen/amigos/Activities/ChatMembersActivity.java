@@ -20,8 +20,7 @@ public class ChatMembersActivity extends SingleFragmentActivity {
             setAction(bundle);
         bundle.putString(ChatMembersFragment.EXTRA_PARAM1, groupId);
 
-        ChatMembersFragment fragment = ChatMembersFragment.newInstance(bundle);
-        return fragment;
+        return ChatMembersFragment.newInstance(bundle);
     }
 
     private void setAction(Bundle bundle) {

@@ -1,25 +1,24 @@
 package com.squareapps.a4teen.amigos.Fragments;
 
-import android.app.Fragment;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import com.squareapps.a4teen.amigos.Activities.LoginActivity;
+import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
+import com.squareapps.a4teen.amigos.Abstract.RecyclerAdapterSelector;
 import com.squareapps.a4teen.amigos.Common.CourseFetchr;
 import com.squareapps.a4teen.amigos.Common.Objects.Course;
 import com.squareapps.a4teen.amigos.R;
+import com.squareapps.a4teen.amigos.ViewHolders.CourseHolder2;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,18 +30,16 @@ import static com.squareapps.a4teen.amigos.Common.Contract.STUDENTS;
 import static java.io.File.separator;
 
 
-public class SearchCourseResultsFragment extends Fragment {
+public class SearchCourseResultsFragment extends FragmentBase implements CourseHolder2.Callbacks {
 
     public static final String COURSES = "courses";
     public static final String USERS = "users";
     @BindView(R.id.course_recycler_view)
     RecyclerView mRecyclerView;
     private List<Course> courses;
-    private FirebaseUser user;
     private DatabaseReference databaseReference;
-    private String courseCode;
-    //[END declare_RecyclerView]
     private CourseAdapter courseAdapter;
+
 
     public static SearchCourseResultsFragment newInstance(List<Course> courseList) {
         SearchCourseResultsFragment fragment = new SearchCourseResultsFragment();
@@ -52,29 +49,19 @@ public class SearchCourseResultsFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        if (user == null) {
-            // Not signed in, launch the Sign In activity
-            startActivity(new Intent(getActivity(), LoginActivity.class));
-            getActivity().finish();
-        }
-    }
-
-    private void setCourses(List<Course> courses) {
-        this.courses = courses;
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference = getDataRef();
         courseAdapter = new CourseAdapter(courses);
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        courseAdapter.clearSelections();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -92,65 +79,74 @@ public class SearchCourseResultsFragment extends Fragment {
         }
     }
 
+    private void setCourses(List<Course> courses) {
+        this.courses = courses;
+    }
+
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onItemSelected(int pos, Course course, View itemView) {
+        courseAdapter.toggleSelection(pos);
+        boolean selected = courseAdapter.isSelected(pos);
+        itemView.setActivated(selected);
+        CourseHolder2 courseHolder2 = (CourseHolder2) mRecyclerView.findContainingViewHolder(itemView);
+        if (!itemView.isActivated() && courseAdapter.getSelectedItemCount() <= 0) {
+            courseHolder2.dismissActionBar();
+        }
+        if (itemView.isActivated() || courseAdapter.getSelectedItemCount() >= 1)
+            courseHolder2.startActionMode();
+
+
     }
 
-    /**
-     * RecclerVIew.Adapter calls this class to create a viewHolder
-     */
-    public class CourseHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    @Override
+    public void onAddItem(Course course) {
+        getDataRef().updateChildren(course.courseSearchToMap());
+        String[] strings = {course.getPrefix(), course.getNumber(), "", "", SearchFormFragment.DETAIL};
+        new FetchItemsTask().execute(strings);
+        getActivity().finish();
 
+    }
 
-        public static final String STUDENTS = "students";
-        @BindView(R.id.course_list_item_text1)
-        TextView mTitleTextView;
-        @BindView(R.id.course_list_item_text2)
-        TextView mSubtitleTextView;
+    @Override
+    public void onDestoryActionBar() {
+        if (courseAdapter.getItemCount() > 0)
+            for (Integer i : courseAdapter.getSelectedItems()) {
+                CourseHolder2 ch2 = (CourseHolder2) mRecyclerView.findViewHolderForAdapterPosition(i);
+                ch2.itemView.setActivated(false);
+            }
+        courseAdapter.clearSelections();
 
-        private Course course;
+    }
 
+    @Override
+    public void updateActionModeCounter(ActionMode mode, Menu menu) {
+        if (mode != null) {
+            MenuItem menuItem = menu.findItem(R.id.menu_counter);
+            menuItem.setActionView(R.layout.menu_counter);
+            TextView textView = (TextView) menuItem.getActionView().findViewById(R.id.counter);
+            textView.setText(String.valueOf(courseAdapter.getSelectedItemCount()));
 
-        public CourseHolder(View v) {
-            super(v);
-            itemView.setOnClickListener(this);
-            ButterKnife.bind(this, itemView);
-
-        }
-
-        public void bind(Course course) {
-            this.course = course;
-            courseCode = course.getPrefix() + course.getNumber();
-            mTitleTextView.setText(course.getTitle());
-            mSubtitleTextView.setText(courseCode + "| " + course.getDepartment());
-        }
-
-        @Override
-        public void onClick(View view) {
-            databaseReference.updateChildren(course.courseSearchToMap());
-            String[] strings = {course.getPrefix(), course.getNumber(), "", "", SearchFormFragment.DETAIL};
-            new FetchItemsTask().execute(strings);
         }
     }
 
-    private class CourseAdapter extends RecyclerView.Adapter<CourseHolder> {
+    private class CourseAdapter extends RecyclerAdapterSelector<Course, CourseHolder2> {
 
         private List<Course> mCourses;
 
-        public CourseAdapter(List<Course> courses) {
+        CourseAdapter(List<Course> courses) {
             mCourses = courses;
         }
 
         @Override
-        public CourseHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public CourseHolder2 onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
             View v = layoutInflater.inflate(R.layout.course_list_item, parent, false);
-            return new CourseHolder(v);
+            return new CourseHolder2(v, SearchCourseResultsFragment.this);
         }
 
         @Override
-        public void onBindViewHolder(CourseHolder holder, int position) {
+        public void onBindViewHolder(CourseHolder2 holder, int position) {
+            holder.itemView.setActivated(isSelected(position));
             Course course = mCourses.get(position);
             holder.bind(course);
         }
@@ -176,8 +172,8 @@ public class SearchCourseResultsFragment extends Fragment {
             for (Course c : courses) {
                 String courseCode = prefix + number;
                 HashMap<String, Object> map = c.courseDetailtoMap(courseCode);
-                map.put(USERS + separator + user.getUid() + separator + COURSES + separator + courseCode, true);
-                map.put(STUDENTS + separator + courseCode + separator + user.getUid(), true);
+                map.put(USERS + separator + getUid() + separator + COURSES + separator + courseCode, true);
+                map.put(STUDENTS + separator + courseCode + separator + getUid(), true);
                 databaseReference.updateChildren(map);
                 courseAdapter.notifyDataSetChanged();
             }

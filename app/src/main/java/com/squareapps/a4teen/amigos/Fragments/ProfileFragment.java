@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
+import com.squareapps.a4teen.amigos.Activities.CollegePickerActivity;
 import com.squareapps.a4teen.amigos.Activities.PhoneAuthActivity;
 import com.squareapps.a4teen.amigos.Common.Objects.Photo;
 import com.squareapps.a4teen.amigos.R;
@@ -56,11 +57,11 @@ import static java.io.File.separator;
 
 public class ProfileFragment extends FragmentBase implements View.OnClickListener {
 
-    private static final String TAG = "ProfileFragment";
-    static final int REQUEST_IMAGE_CAPTURE = 0401;
-    private static final int REQUEST_IMAGE = 0400;
-    private static final int REQUEST_CELLPHONE = 0402;
-    private static final int REQUEST_COLLEGE = 0403;
+    private static final int REQUEST_IMAGE_CAPTURE = 401;
+    private static final int REQUEST_IMAGE = 400;
+    private static final int REQUEST_CELLPHONE = 402;
+    private static final int REQUEST_COLLEGE = 403;
+
 
     private static final String KEY_FILE_URI = "key_file_uri";
     private static final String KEY_DOWNLOAD_URL = "key_download_url";
@@ -78,8 +79,8 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
     TextView cellphone;
     @BindView(R.id.profile_fab)
     FloatingActionButton fab;
-    @BindView(R.id.school_edit_text)
-    EditText linkedAccounts;
+    @BindView(R.id.school_text_view)
+    TextView school;
     @BindView(R.id.gender_edit_text)
     EditText gender;
 
@@ -180,7 +181,7 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
                                     name.setText(snapshot.getValue().toString());
                                     break;
                                 case COLLEGE:
-                                    linkedAccounts.setText(snapshot.getValue().toString());
+                                    school.setText(snapshot.getValue().toString());
                                     break;
                                 case GENDER:
                                     gender.setText(snapshot.getValue().toString());
@@ -210,6 +211,7 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
         setBirthdate();
         fab.setOnClickListener(this);
         cellphone.setOnClickListener(this);
+        school.setOnClickListener(this);
         registerForContextMenu(fab);
         return view;
     }
@@ -231,6 +233,11 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
                 phoneAuth.putExtras(bundle);
 
                 getActivity().startActivityForResult(phoneAuth, REQUEST_CELLPHONE);
+                break;
+            case R.id.school_text_view:
+                Intent collegePicker = new Intent(getActivity(), CollegePickerActivity.class);
+                startActivityForResult(collegePicker, REQUEST_COLLEGE);
+                break;
 
         }
 
@@ -257,6 +264,18 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
                     final Uri uri = data.getData();
                     uploadImage(uri);
                 }
+                break;
+
+            case REQUEST_COLLEGE:
+                if (data != null) {
+                    Bundle bundle = data.getExtras();
+                    String college = bundle.getString(COLLEGE);
+                    getDataRef().child(USERS)
+                            .child(getUid())
+                            .child(COLLEGE)
+                            .setValue(college);
+                }
+
                 break;
         }
 
@@ -357,7 +376,7 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
         String mDownloadUrl = intent.getStringExtra(UploadService.EXTRA_DOWNLOAD_URL);
         mFileUri = intent.getParcelableExtra(UploadService.EXTRA_FILE_URI);
 
-        Log.d("downloadUrl", mDownloadUrl.toString());
+        Log.d("downloadUrl", mDownloadUrl);
 
         HashMap<String, Object> map = new HashMap<>();
         map.put(USERS + separator

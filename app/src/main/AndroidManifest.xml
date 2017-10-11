@@ -34,6 +34,7 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
@@ -46,15 +47,7 @@ Set custom default icon. This is used when no icon is set for incoming notificat
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_message_black_24dp" />
 
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.squareapps.a4teen.amigos.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/files" />
-        </provider>
+        <!-- Activities-->
 
         <activity
             android:name=".Activities.LauncherActivity"
@@ -67,7 +60,11 @@ Set custom default icon. This is used when no icon is set for incoming notificat
             </intent-filter>
         </activity>
 
-        <activity android:name=".Activities.PhoneAuthActivity" />
+        <activity
+            android:name=".Activities.PhoneAuthActivity"
+            android:parentActivityName=".Activities.ProfileActivity"
+            tools:ignore="InnerclassSeparator" />
+
         <activity
             android:name=".Activities.LoginActivity"
             android:label="@string/app_name"
@@ -85,6 +82,7 @@ Set custom default icon. This is used when no icon is set for incoming notificat
                 android:name="android.support.UI_OPTIONS"
                 android:value="splitActionBarWhenNarrow" />
         </activity>
+
         <activity
             android:name=".Activities.SearchUsersActivity"
             android:label="@string/search_title"
@@ -98,8 +96,10 @@ Set custom default icon. This is used when no icon is set for incoming notificat
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".Activities.DetailActivity"
+            android:parentActivityName=".Activities.MainActivity"
             tools:ignore="InnerclassSeparator" />
         <activity
             android:name=".Activities.SearchFormActivity"
@@ -114,7 +114,43 @@ Set custom default icon. This is used when no icon is set for incoming notificat
             </intent-filter>
         </activity>
 
-        <!-- [START gcm_listener] -->
+        <activity
+            android:name=".Activities.SettingsActivity"
+            android:label="@string/action_settings"
+            tools:ignore="InnerclassSeparator" />
+
+        <activity
+            android:name=".Activities.ChatActivity"
+            android:label="@string/app_name"
+            android:parentActivityName=".Activities.MainActivity"
+            tools:ignore="InnerclassSeparator" />
+
+        <activity
+            android:name=".Activities.ProfileActivity"
+            android:parentActivityName=".Activities.MainActivity"
+            tools:ignore="InnerclassSeparator" />
+
+        <activity
+            android:name=".Activities.ChatMembersActivity"
+            android:label="@string/title_activity_chat_members"
+            android:parentActivityName=".Activities.ChatActivity"
+            tools:ignore="InnerclassSeparator" />
+
+        <activity
+            android:name=".Activities.ChatMediaActivity"
+            android:parentActivityName=".Activities.ChatActivity"
+            tools:ignore="InnerclassSeparator" />
+
+        <activity
+            android:name=".Activities.CollegePickerActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".Activities.ProfileActivity"
+            tools:ignore="InnerclassSeparator">
+        </activity>
+
+
+        <!-- Services-->
+
         <service
             android:name=".Gcm.MyFcmListenerService"
             tools:ignore="ExportedService,InnerclassSeparator">
@@ -124,10 +160,8 @@ Set custom default icon. This is used when no icon is set for incoming notificat
                    
             </intent-filter>
         </service>
-        <!-- [END gcm_listener] -->
 
 
-        <!-- [START fb_listener] -->
         <service
             android:name=".Gcm.MyInstanceIDListenerService"
             tools:ignore="ExportedService,InnerclassSeparator">
@@ -138,44 +172,34 @@ Set custom default icon. This is used when no icon is set for incoming notificat
                    
             </intent-filter>
         </service>
-        <!-- [END instanceId_listener] -->
-
-        <provider
-            android:name=".Common.common.db.DataProvider"
-            android:authorities="com.square.apps.provider"
-            android:exported="false" />
-        <provider
-            android:name=".Common.common.db.MySuggestionProvider"
-            android:authorities="com.square.apps.MySuggestionProvider"
-            tools:ignore="ExportedContentProvider" />
-
-        <activity
-            android:name=".Activities.SettingsActivity"
-            android:label="@string/action_settings"
-            tools:ignore="InnerclassSeparator" />
-        <activity
-            android:name=".Activities.ChatActivity"
-            android:label="@string/app_name"
-            android:parentActivityName=".Activities.MainActivity"
-            tools:ignore="InnerclassSeparator" />
-        <activity
-            android:name=".Activities.ProfileActivity"
-            android:parentActivityName=".Activities.MainActivity"
-            tools:ignore="InnerclassSeparator" />
-        <activity
-            android:name=".Activities.ChatMembersActivity"
-            android:label="@string/title_activity_chat_members"
-            android:parentActivityName=".Activities.ChatActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Activities.ChatActivity" />
-        </activity>
-        <activity android:name=".Activities.ChatMediaActivity" />
 
         <service
             android:name=".UploadService"
             android:exported="false" />
+
+
+        <!-- providers-->
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.squareapps.a4teen.amigos.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/files" />
+        </provider>
+
+        <provider
+            android:name=".Common.common.db.DataProvider"
+            android:authorities="com.square.apps.provider"
+            android:exported="false"
+            tools:ignore="InnerclassSeparator" />
+        <provider
+            android:name=".Common.common.db.MySuggestionProvider"
+            android:authorities="com.square.apps.MySuggestionProvider"
+            tools:ignore="ExportedContentProvider,InnerclassSeparator" />
+
     </application>
 
 </manifest>

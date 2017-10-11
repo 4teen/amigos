@@ -1,7 +1,5 @@
 package com.squareapps.a4teen.amigos.Common;
 
-import java.util.HashMap;
-
 public class Contract {
 
     //DATABASE FINAL STRINGS
@@ -45,7 +43,6 @@ public class Contract {
     public static final String MESSAGE = "message";
     public static final String TIMESTAMP = "timestamp";
     public static final String NAME = "name";
-    public static final String COURSES = "courses";
     public static final String COURSE_ID = "courseID";
     public static final String TITLE = "title";
     public static final String DEPARTMENT = "department";
@@ -75,8 +72,8 @@ public class Contract {
     public static final String GENDER = "gender";
     public static final String PATH = "path";
     public static final String IMAGE_URL = "imageUrl";
-
-    private static HashMap<String, String> searchFormHashMap = new HashMap<>();
+    public static final String COURSES = "courses";
+    public static final String SCHOOLS = "schools";
 
 
     private Contract() {

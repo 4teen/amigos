@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize" />
+
+        </android.support.design.widget.AppBarLayout>
+    </android.support.design.widget.CoordinatorLayout>
+
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
+        android:shrinkColumns="1">
+
+        <TextView
+            android:id="@+id/textView0"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:text="@string/title" />
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView1"
+                style="@style/AppTheme.TableRow.Left"
+                android:text="@string/description" />
+
+            <TextView
+                android:id="@+id/detail_description"
+                style="@style/AppTheme.TableRow.Right" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView2"
+                style="@style/AppTheme.TableRow.Left"
+                android:text="@string/credit_hours" />
+
+            <TextView
+                android:id="@+id/detail_credits"
+                style="@style/AppTheme.TableRow.Right" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView3"
+                style="@style/AppTheme.TableRow.Left"
+                android:text="@string/prerequisites" />
+
+            <TextView
+                android:id="@+id/detail_prerequisites"
+                style="@style/AppTheme.TableRow.Right" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView4"
+                style="@style/AppTheme.TableRow.Left"
+                android:text="@string/corequisites" />
+
+            <TextView
+                android:id="@+id/detail_corequisites"
+                style="@style/AppTheme.TableRow.Right" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView5"
+                style="@style/AppTheme.TableRow.Left"
+                android:text="@string/co_prerequisites" />
+
+            <TextView
+                android:id="@+id/detail_co_prerequsites"
+                style="@style/AppTheme.TableRow.Right" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView6"
+                style="@style/AppTheme.TableRow.Left"
+                android:text="@string/course_requirements" />
+
+            <TextView
+                android:id="@+id/detail_requirements"
+                style="@style/AppTheme.TableRow.Right" />
+
+        </TableRow>
+    </TableLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_margin="@dimen/margin_1"
+        android:src="@drawable/ic_group_black_24dp" />
+</LinearLayout>

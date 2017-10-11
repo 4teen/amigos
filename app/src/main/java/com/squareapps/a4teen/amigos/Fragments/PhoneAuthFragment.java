@@ -30,9 +30,6 @@ import java.util.concurrent.TimeUnit;
 import static com.firebase.ui.auth.ResultCodes.OK;
 import static com.squareapps.a4teen.amigos.Common.Contract.PHONE_NUMBER;
 
-/**
- * Created by y-pol on 9/30/2017.
- */
 
 public class PhoneAuthFragment extends FragmentBase implements View.OnClickListener {
 

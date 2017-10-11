@@ -70,7 +70,7 @@
                 android:layout_marginBottom="8dp"
                 android:layout_marginLeft="24dp"
                 android:background="@color/white"
-                app:layout_constraintBottom_toBottomOf="@+id/school_edit_text"
+                app:layout_constraintBottom_toBottomOf="@+id/school_text_view"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:srcCompat="@drawable/ic_school_black_24dp" />
 
@@ -135,22 +135,18 @@
                 android:layout_marginRight="0dp"
                 android:layout_marginTop="24dp"
                 android:ems="10"
-                android:hint="Birthdate"
-                android:inputType="textPersonName"
                 app:layout_constraintLeft_toRightOf="@+id/profile_birthday_image_button"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profile_name_editText" />
 
-            <EditText
-                android:id="@+id/school_edit_text"
+            <TextView
+                android:id="@+id/school_text_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="0dp"
                 android:layout_marginTop="24dp"
                 android:ems="10"
-                android:hint="Linked Accounts"
-                android:inputType="textPersonName"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toRightOf="@+id/school_image_button"
                 app:layout_constraintRight_toRightOf="parent"
@@ -164,8 +160,6 @@
                 android:layout_marginRight="0dp"
                 android:layout_marginTop="24dp"
                 android:ems="10"
-                android:hint="Cellphone"
-                android:inputType="phone"
                 app:layout_constraintLeft_toRightOf="@+id/profile_cellphone_image_button"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/gender_edit_text" />

@@ -54,6 +54,7 @@ public class UploadService extends BaseTaskService {
     protected void onHandleIntent(@Nullable Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
+            Bundle bundle = intent.getExtras();
             if (ACTION_UPLOAD.equals(action)) {
                 handleActionUpload(intent);
             }
@@ -64,10 +65,10 @@ public class UploadService extends BaseTaskService {
     private void handleActionUpload(Intent intent) {
         Uri fileUri = intent.getExtras().getParcelable(EXTRA_FILE_URI);
         String path = intent.getExtras().getString(PATH);
-        uploadFromUri(fileUri, path);
+        uploadFromUri(fileUri, path, intent);
     }
 
-    private void uploadFromUri(final Uri fileUri, final String path) {
+    private void uploadFromUri(final Uri fileUri, final String path, final Intent intent) {
 
         showProgressNotification(getString(R.string.app_name), 0, 0);
 
@@ -88,13 +89,13 @@ public class UploadService extends BaseTaskService {
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Get the public download URL
                         String downloadUrl = taskSnapshot.getStorage().toString();
-                        broadcastUploadFinished(downloadUrl, fileUri);
+                        broadcastUploadFinished(downloadUrl, fileUri, intent);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        broadcastUploadFinished(null, fileUri);
+                        broadcastUploadFinished(null, fileUri, intent);
 
                     }
                 });
@@ -106,12 +107,13 @@ public class UploadService extends BaseTaskService {
      *
      * @return true if a running receiver received the broadcast.
      */
-    private boolean broadcastUploadFinished(String downloadUrl, @Nullable Uri fileUri) {
+    private boolean broadcastUploadFinished(String downloadUrl, @Nullable Uri fileUri, Intent i) {
         boolean success = downloadUrl != null;
 
         String action = success ? UPLOAD_COMPLETED : UPLOAD_ERROR;
 
         Intent broadcast = new Intent(action)
+                .putExtras(i.getExtras())
                 .putExtra(EXTRA_DOWNLOAD_URL, downloadUrl)
                 .putExtra(EXTRA_FILE_URI, fileUri);
         return LocalBroadcastManager.getInstance(getApplicationContext())

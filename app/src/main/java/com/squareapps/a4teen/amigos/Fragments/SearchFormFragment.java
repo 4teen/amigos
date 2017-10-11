@@ -37,7 +37,6 @@ public class SearchFormFragment extends Fragment implements View.OnClickListener
     public final static String SEARCH = "search";
     public final static String DETAIL = "detail";
     private final static String OUTPUTTYPE = "outputType";
-    private static String TAG = "searCourseFragment";
     @BindView(R.id.prefix_spinner)
     Spinner prefix_spinner;
     ArrayAdapter<CharSequence> prefixSpinnerAdapter;
@@ -169,6 +168,7 @@ public class SearchFormFragment extends Fragment implements View.OnClickListener
         protected void onPostExecute(List<Course> courses) {
             searchForm.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
+            assert callbacks != null;
             callbacks.onSubmitQuery(courses);
         }
     }

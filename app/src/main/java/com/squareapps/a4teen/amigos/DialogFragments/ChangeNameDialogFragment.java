@@ -9,9 +9,7 @@ import android.util.Log;
 
 import com.squareapps.a4teen.amigos.Abstract.BaseDialogFragment;
 
-/**
- * Created by y-pol on 7/8/2017.
- */
+
 
 public class ChangeNameDialogFragment extends BaseDialogFragment {
 

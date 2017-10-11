@@ -2,25 +2,23 @@ package com.squareapps.a4teen.amigos.Fragments;
 
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.graphics.drawable.VectorDrawableCompat;
-import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,30 +29,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+import com.google.firebase.database.ValueEventListener;
 import com.squareapps.a4teen.amigos.Abstract.BaseDialogFragment;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
 import com.squareapps.a4teen.amigos.Activities.ChatMediaActivity;
 import com.squareapps.a4teen.amigos.Activities.ChatMembersActivity;
-import com.squareapps.a4teen.amigos.Activities.LoginActivity;
 import com.squareapps.a4teen.amigos.Activities.SearchUsersActivity;
 import com.squareapps.a4teen.amigos.Common.Objects.Message;
 import com.squareapps.a4teen.amigos.Common.Objects.Photo;
-import com.squareapps.a4teen.amigos.Common.common.FirebaseUtils;
 import com.squareapps.a4teen.amigos.DialogFragments.ChangeNameDialogFragment;
 import com.squareapps.a4teen.amigos.R;
 import com.squareapps.a4teen.amigos.UploadService;
+import com.squareapps.a4teen.amigos.ViewHolders.ChatHolder;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -64,9 +55,9 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.app.Activity.RESULT_OK;
+import static com.squareapps.a4teen.amigos.Common.Contract.AVATAR_URL;
 import static com.squareapps.a4teen.amigos.Common.Contract.GROUPS;
 import static com.squareapps.a4teen.amigos.Common.Contract.GROUP_ID;
 import static com.squareapps.a4teen.amigos.Common.Contract.GROUP_NAME;
@@ -76,6 +67,7 @@ import static com.squareapps.a4teen.amigos.Common.Contract.MESSAGE;
 import static com.squareapps.a4teen.amigos.Common.Contract.MESSAGES;
 import static com.squareapps.a4teen.amigos.Common.Contract.NAME;
 import static com.squareapps.a4teen.amigos.Common.Contract.PATH;
+import static com.squareapps.a4teen.amigos.Common.Contract.PHOTO_URL;
 import static com.squareapps.a4teen.amigos.Common.Contract.TIMESTAMP;
 import static com.squareapps.a4teen.amigos.Fragments.SearchCourseResultsFragment.USERS;
 import static com.squareapps.a4teen.amigos.UploadService.EXTRA_FILE_URI;
@@ -87,10 +79,10 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
     private static final String LOADING_IMAGE_URL = "https://www.google.com/images/spin-32.gif";
     private static final String TAG = "ChatFragment";
-    private static final int REQUEST_CHANGE_NAME = 0415;
-    private static final int REQUEST_IMAGE = 0416;
-    private final FirebaseUtils firebaseUtils = new FirebaseUtils() {
-    };
+    private static final int REQUEST_CHANGE_NAME = 269;
+    private static final int REQUEST_IMAGE = 270;
+    private static final int REQUEST_CHANGE_AVATAR = 271;
+
     @BindView(R.id.chat_fragment_drawerLayout)
     DrawerLayout drawerLayout;
     @BindView(R.id.chat_fragment_nav_view)
@@ -108,18 +100,17 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     @BindView(R.id.chat_toolbar)
     Toolbar toolbar;
 
-    ImageView navHeaderImageView;
+    private ImageView navHeaderImageView;
 
-    private String mUsername;
-    private String mUid;
-    private String mPhotoUrl;
-    private String groupID;
+    private BroadcastReceiver mBroadcastReceiver;
+    private ValueEventListener avatarEventListener;
+
+    private String mUsername, mPhotoUrl, groupID, groupName;
+
     private LinearLayoutManager mLinearLayoutManager;
     // Firebase instance variables
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseUser mFirebaseUser;
     private DatabaseReference mFirebaseDatabaseReference;
-    private FirebaseRecyclerAdapter<Message, MessageViewHolder> mFirebaseAdapter;
+    private FirebaseRecyclerAdapter<Message, ChatHolder> mFirebaseAdapter;
 
     @NonNull
     public static ChatFragment newInstance(Bundle bundle) {
@@ -131,35 +122,76 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-        if (mFirebaseUser == null) {
-            // Not signed in, launch the Sign In activity
-            startActivity(new Intent(getActivity(), LoginActivity.class));
-            getActivity().finish();
-        }
+        // Register receiver for uploads and downloads
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getActivity());
+        manager.registerReceiver(mBroadcastReceiver, UploadService.getIntentFilter());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Unregister download receiver
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mFirebaseAdapter.cleanup();
+        mFirebaseDatabaseReference.removeEventListener(avatarEventListener);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putAll(getArguments());
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
+
+        Bundle bundle = getArguments();
+
+        if (bundle == null && savedInstanceState != null) {
+            groupName = savedInstanceState.getString(GROUP_NAME);
+            groupID = savedInstanceState.getString(GROUP_ID);
+        } else if (bundle != null) {
+            groupName = bundle.getString(GROUP_NAME);
+            groupID = bundle.getString(GROUP_ID);
+        }
 
 
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabaseReference = getDataRef();
 
-        mUsername = mFirebaseUser.getDisplayName();
-        mUid = mFirebaseUser.getUid();
+        mUsername = getUser().getDisplayName();
 
-        if (mFirebaseUser.getPhotoUrl() != null) {
-            mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
+        if (getAvatarUrl() != null) {
+            mPhotoUrl = getAvatarUrl();
 
         }
+
         mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mLinearLayoutManager.setStackFromEnd(true);
 
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //    hideProgressDialog();
+
+                switch (intent.getAction()) {
+                    case UploadService.UPLOAD_COMPLETED:
+                    case UploadService.UPLOAD_ERROR:
+                        onUploadResultIntent(intent);
+                        break;
+                }
+            }
+        };
+
+
     }
+
 
     @Nullable
     @Override
@@ -168,35 +200,16 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
         final View view = inflater.inflate(R.layout.activity_chat, container, false);
         ButterKnife.bind(this, view);
 
-        Bundle bundle = getArguments();
-        String groupName = bundle.getSerializable(GROUP_NAME).toString();
-        groupID = bundle.getSerializable(GROUP_ID).toString();
-
         toolbar.setTitle(groupName);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+
+        setToolbar(toolbar, R.drawable.ic_arrow_back_black_24dp);
 
         View navheader = navigationView.getHeaderView(0);//navHeader index = 0
         navHeaderImageView = (ImageView) navheader.findViewById(R.id.nav_header_image_view);
         navHeaderImageView.setImageDrawable(getResources().getDrawable(android.R.drawable.sym_def_app_icon));
 
-
-        // Adding menu icon to Toolbar
-        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (supportActionBar != null) {
-            VectorDrawableCompat indicator
-                    = VectorDrawableCompat.create(getResources(), R.drawable.ic_arrow_back_black_24dp, getActivity().getTheme());
-            indicator
-                    .setTint(ResourcesCompat.getColor(getResources(), R.color.white, getActivity().getTheme()));
-
-            supportActionBar.setHomeAsUpIndicator(indicator);
-
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
-
         setupNavigationView();
-
 
         if (groupID == null) throw new AssertionError();
 
@@ -205,6 +218,22 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
         //[START initialize_recycler_view]
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
         //[END initialize_recycler_view]
+
+        avatarEventListener = mFirebaseDatabaseReference.child(GROUPS)
+                .child(groupID)
+                .child(AVATAR_URL)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.getValue() != null)
+                            setImageView(dataSnapshot.getValue().toString(), navHeaderImageView);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
         //[START initialize_mMesageEditText_TextWatcher]
         mMessageEditText.addTextChangedListener(new TextWatcher() {
@@ -227,40 +256,20 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
             }
         });
 
-        mSendButton.setOnClickListener(this);
-        mAddMessageImageView.setOnClickListener(this);
 
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<Message, MessageViewHolder>
+        mFirebaseAdapter = new FirebaseRecyclerAdapter<Message, ChatHolder>
                 (Message.class,
                         R.layout.activity_chat_list_item, //layout
-                        MessageViewHolder.class,//viewholder
-                        mFirebaseDatabaseReference.child(MESSAGES + separator + groupID))
+                        ChatHolder.class,//viewholder
+                        mFirebaseDatabaseReference
+                                .child(MESSAGES)
+                                .child(groupID))
 
         {
 
             @Override
-            protected void populateViewHolder(final MessageViewHolder viewHolder, Message model, int position) {
-                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-
-
-                if (model.getText() != null) {
-                    viewHolder.messageTextView.setText(model.getText());
-
-                    viewHolder.messageTextView.setVisibility(TextView.VISIBLE);
-                    viewHolder.messageImageView.setVisibility(ImageView.GONE);
-                } else {
-
-                    FirebaseUtils.setImageView(model.getImageUrl(), viewHolder.messageImageView);
-
-                    viewHolder.messageTextView.setVisibility(TextView.GONE);
-                    viewHolder.messageImageView.setVisibility(ImageView.VISIBLE);
-
-                }
-
-                //populate name of sender
-                viewHolder.messengerTextView.setText(model.getName());
-
-                FirebaseUtils.setImageView(model.getPhotoUrl(), viewHolder.messengerImageView);
+            protected void populateViewHolder(final ChatHolder viewHolder, Message model, int position) {
+                viewHolder.bind(model);
 
             }
             //[END_PopulateViewHolder]
@@ -285,7 +294,10 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
         mMessageRecyclerView.setAdapter(mFirebaseAdapter);
-        registerForContextMenu(mMessageRecyclerView);
+
+        mSendButton.setOnClickListener(this);
+        mAddMessageImageView.setOnClickListener(this);
+
         return view;
 
     }
@@ -296,7 +308,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
                 new NavigationView.OnNavigationItemSelectedListener() {
                     // This method will trigger on item Click of navigation menu
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         // Set item in checked state
                         menuItem.setChecked(true);
 
@@ -323,7 +335,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
                 });
     }
 
-    public void sendMessage(Message message) {
+    private String sendMessage(Message message) {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
         Date date = new Date();
 
@@ -334,50 +346,85 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
         message.setId(messageId);
 
+        getDataRef().child(MESSAGES)
+                .child(groupID)
+                .child(messageId)
+                .setValue(message);
+
         HashMap<String, Object> map = new HashMap<>();
 
-        map.put(MESSAGES + separator + groupID + separator + messageId, message);
-        map.put(USERS + separator + mUid + separator + MESSAGES + separator + messageId + separator + groupID, true);
-        map.put(GROUPS + separator + groupID + separator + MESSAGE, mUsername + ": " + message.getText());
-        map.put(GROUPS + separator + groupID + separator + TIMESTAMP, dateFormat.format(date));
+        map.put(USERS + separator +
+                getUid() + separator +
+                MESSAGES + separator +
+                messageId + separator +
+                groupID, true);
 
-        updateDataSet(map);
+        map.put(GROUPS + separator +
+                groupID + separator +
+                MESSAGE, mUsername + ": " + message.getText());
+
+        map.put(GROUPS + separator +
+                groupID + separator +
+                TIMESTAMP, dateFormat.format(date));
+
+        getDataRef().updateChildren(map);
+
+        return messageId;
 
     }
 
-    public void sendPhoto(final Uri data) {
-        Photo photo = new Photo(null, getUid(), groupID);
-
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
-        Date date = new Date();
-
-        String photoId = mFirebaseDatabaseReference
-                .child(MEDIA)
-                .child(groupID)
-                .push().getKey();
-
-        photo.setId(photoId);
-        photo.setTimeStamp(dateFormat.format(date));
+    private void sendPhotoMessage(final Uri data) {
 
         Message tempMessage = new Message(
-                mUid,
+                getUid(),
                 null,
                 null,
                 mUsername,
                 mPhotoUrl,
                 LOADING_IMAGE_URL);
 
-        sendMessage(tempMessage);
+        String photoID = sendMessage(tempMessage);
 
-        String update1 = MESSAGES + separator + groupID + separator + tempMessage.getId() + separator + IMAGE_URL;
-        String update2 = MEDIA + separator + groupID + photo.getId() + IMAGE_URL;
+        Photo photo = new Photo(mPhotoUrl, getUid(), groupID, photoID);
+        photo.setTimeStamp(tempMessage.getTimeStamp());
+
+        HashMap<String, Object> map = new HashMap<>();
+
+        map.put(MEDIA + separator +
+                groupID + separator +
+                photoID, photo);
+
+        map.put(USERS + separator +
+                getUid() + separator +
+                MEDIA + separator +
+                photoID, true);
+
+        map.put(GROUPS + separator +
+                groupID + separator +
+                MESSAGE, getUser().getDisplayName() + "| image");
+
+        getDataRef().updateChildren(map);
+
+        String update1 = MESSAGES + separator +
+                groupID + separator +
+                photoID + separator +
+                IMAGE_URL;
+
+        String update2 = MEDIA + separator +
+                groupID + separator +
+                photoID + separator +
+                PHOTO_URL;
+
+        uploadImage(data, photoID, update1, update2);
+    }
+
+    private void uploadImage(Uri data, String photoID, String... strings) {
 
         Bundle bundle = new Bundle();
-        bundle.putString(PATH, MEDIA + separator + groupID + photo.getId());
+        bundle.putStringArray("updates", strings);
+        bundle.putString(PATH, MEDIA + separator + groupID + photoID);
         bundle.putParcelable(EXTRA_FILE_URI, data);
         UploadService.startActionUpload(getContext(), bundle);
-
-
     }
 
     @Override
@@ -390,7 +437,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
             case REQUEST_IMAGE:
                 if (data != null) {
                     final Uri uri = data.getData();
-                    sendPhoto(uri);
+                    sendPhotoMessage(uri);
 
                 }
                 break;
@@ -405,18 +452,42 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
                     HashMap<String, Object> groupsMap = new HashMap<>();
                     groupsMap.put(GROUPS + separator + groupID + separator + NAME + separator, groupName);
 
-                    updateDataSet(groupsMap);
+                    getDataRef().updateChildren(groupsMap);
                 }
 
+                break;
+            case REQUEST_CHANGE_AVATAR:
+                final Uri avatarFile = data.getData();
+
+                String photoID = getDataRef().child(MEDIA)
+                        .child(groupID)
+                        .push().getKey();
+
+                Photo photo = new Photo(null, getUid(), groupID, photoID);
+
+                DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
+                Date date = new Date();
+                photo.setTimeStamp(dateFormat.format(date));
+
+                getDataRef().child(MEDIA)
+                        .child(groupID)
+                        .child(photoID)
+                        .setValue(photo);
+
+                String update1 = MEDIA + separator +
+                        groupID + separator +
+                        photoID + separator +
+                        PHOTO_URL;
+
+                String update2 = GROUPS + separator +
+                        groupID + separator +
+                        AVATAR_URL;
+
+                uploadImage(avatarFile, photoID, update1, update2);
                 break;
 
             default:
         }
-    }
-
-    private void updateDataSet(HashMap<String, Object> groupsMap) {
-        mFirebaseDatabaseReference.updateChildren(groupsMap);
-        mFirebaseAdapter.notifyDataSetChanged();
     }
 
 
@@ -445,7 +516,12 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
                 changeNameDialogFragment.show(fragmentManager, "CHANGE NAME DIALOG FRAGMENT");
                 return true;
 
+
             case R.id.change_avatar:
+                dispatchPictureIntent(REQUEST_CHANGE_AVATAR);
+                break;
+
+            case R.id.menu:
                 drawerLayout.openDrawer(GravityCompat.END);
                 break;
 
@@ -464,8 +540,8 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
                 HashMap<String, Object> map = new HashMap<>();
                 map.put(MESSAGES + separator + groupID + separator + message.getId(), null);
-                map.put(USERS + separator + mUid + separator + MESSAGES + separator + message.getId(), null);
-                updateDataSet(map);
+                map.put(USERS + separator + getUid() + separator + MESSAGES + separator + message.getId(), null);
+                getDataRef().updateChildren(map);
 
                 return true;
             case R.id.chat_fragment_copyText_item_menu:
@@ -480,7 +556,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.sendButton:
-                final Message friendlyMessage = new Message(mUid,
+                final Message friendlyMessage = new Message(getUid(),
                         null,
                         mMessageEditText.getText().toString(),
                         mUsername,
@@ -492,11 +568,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
                 mMessageEditText.setText("");
                 break;
             case R.id.addMessageImageView:
-                // Select image for image message on click.
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("image/*");
-                startActivityForResult(intent, REQUEST_IMAGE);
+                dispatchPictureIntent(REQUEST_IMAGE);
                 break;
 
 
@@ -504,33 +576,30 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
     }
 
+    private void onUploadResultIntent(Intent intent) {
 
-    public static class MessageViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
-        @BindView(R.id.messageTextView)
-        TextView messageTextView;
+        // Got a new intent from MyUploadService with a success or failure
+        String mDownloadUrl = intent.getStringExtra(UploadService.EXTRA_DOWNLOAD_URL);
+        Log.d("downloadUrl", mDownloadUrl);
 
-        @BindView(R.id.messageImageView)
-        ImageView messageImageView;
+        String[] updates = intent.getStringArrayExtra("updates");
 
-        @BindView(R.id.messengerTextView)
-        TextView messengerTextView;
-
-        @BindView(R.id.messengerImageView)
-        CircleImageView messengerImageView;
-
-        public MessageViewHolder(View v) {
-            super(v);
-            itemView.setOnCreateContextMenuListener(this);
-            ButterKnife.bind(this, itemView);
+        HashMap<String, Object> map = new HashMap<>();
+        for (String update : updates) {
+            map.put(update, mDownloadUrl);
+            Log.d("updates", update);
         }
+        getDataRef().updateChildren(map);
 
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.setHeaderTitle("Message Options");
-            menu.add(0, R.id.chat_fragment_delete_item_menu, getAdapterPosition(), "Delete");
-            menu.add(0, R.id.chat_fragment_copyText_item_menu, getAdapterPosition(), "Copy text");
-
-
-        }
     }
+
+    private void dispatchPictureIntent(final int requestCode) {
+        // Select image for image message on click.
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(intent, requestCode);
+    }
+
+
 }

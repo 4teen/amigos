@@ -1,9 +1,5 @@
 package com.squareapps.a4teen.amigos.Common.Objects;
 
-/**
- * Created by y-pol on 6/29/2017.
- */
-
 public class Message {
     private String senderId;
     private String id;
@@ -11,6 +7,7 @@ public class Message {
     private String name;
     private String photoUrl;
     private String imageUrl;
+    private String timeStamp;
 
     public Message() {
     }
@@ -22,6 +19,14 @@ public class Message {
         this.name = name;
         this.photoUrl = photoUrl; //my profile pic
         this.imageUrl = imageUrl;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public String getSenderId() {

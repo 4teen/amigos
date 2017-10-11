@@ -1,16 +1,19 @@
 package com.squareapps.a4teen.amigos.Common.Objects;
 
-/**
- * Created by y-pol on 6/30/2017.
- */
+import com.google.firebase.database.Exclude;
+
 
 public class User {
+
     private String id;
+
     private String name;
     private String email;
     private String avatarUrl;
-    private String phoneNumber;
+    private Long phoneNumber;
     private String school;
+
+    @Exclude
     private String birthdate;
 
     public User() {
@@ -21,11 +24,11 @@ public class User {
         this.email = email;
     }
 
-    public String getPhoneNumber() {
+    public Long getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
+    public void setPhoneNumber(Long phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -75,5 +78,10 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }
