@@ -11,7 +11,7 @@ import com.squareapps.a4teen.amigos.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SchoolHolder extends HolderBase<School> implements View.OnClickListener {
+public class SchoolHolder extends HolderBase implements View.OnClickListener {
 
     @BindView(R.id.course_list_item_text1)
     TextView mTitleTextView;

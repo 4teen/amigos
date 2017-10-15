@@ -27,6 +27,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
+import com.squareapps.a4teen.amigos.Activities.AddFriendsActivity;
 import com.squareapps.a4teen.amigos.Activities.LoginActivity;
 import com.squareapps.a4teen.amigos.Activities.ProfileActivity;
 import com.squareapps.a4teen.amigos.Activities.SearchFormActivity;
@@ -86,7 +87,7 @@ public class MainFragment extends FragmentBase {// Declare the constants
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.activity_tab_home, container, false);
+        View v = inflater.inflate(R.layout.activity_main, container, false);
         ButterKnife.bind(this, v);
 
         setToolbar(toolbar, R.drawable.ic_menu_black_24dp);
@@ -105,12 +106,17 @@ public class MainFragment extends FragmentBase {// Declare the constants
 
                         switch (menuItem.getItemId()) {
 
-                            case R.id.nav_bookmark:
+                            case R.id.nav_search_class:
                                 initSearchFormActivity();
                                 break;
                             case R.id.nav_profile:
                                 Intent profileSettings = new Intent(getActivity(), ProfileActivity.class);
                                 getActivity().startActivity(profileSettings);
+                                break;
+
+                            case R.id.nav_add_friends:
+                                Intent addFriends = new Intent(getActivity(), AddFriendsActivity.class);
+                                getActivity().startActivity(addFriends);
                                 break;
 
                         }
@@ -124,7 +130,7 @@ public class MainFragment extends FragmentBase {// Declare the constants
                 });
 
         View headerView = navigationView.getHeaderView(0);
-        final ImageView imageView = (ImageView) headerView.findViewById(R.id.nav_header_image_view);
+        final ImageView imageView =  headerView.findViewById(R.id.nav_header_image_view);
 
         if (getAvatarUrl() == null) {
             getDataRef()
@@ -181,7 +187,7 @@ public class MainFragment extends FragmentBase {// Declare the constants
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_tab_home, menu);
+        inflater.inflate(R.menu.menu_main, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

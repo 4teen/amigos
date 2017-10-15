@@ -32,8 +32,8 @@ public abstract class BaseDialogFragment extends DialogFragment {
         dialogView = LayoutInflater.from(getActivity())
                 .inflate(getLayoutRes(), null);
 
-        dialogViewTex2 = (TextView) dialogView.findViewById(R.id.dialog_fragment_text1);
-        dialogViewTex1 = (EditText)dialogView.findViewById(R.id.dialog_fragment_et);
+        dialogViewTex2 = dialogView.findViewById(R.id.dialog_fragment_text1);
+        dialogViewTex1 = dialogView.findViewById(R.id.dialog_fragment_et);
 
         return createDialog();
     }

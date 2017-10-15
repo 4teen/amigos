@@ -13,7 +13,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatHolder extends HolderBase<Message> implements View.OnCreateContextMenuListener {
+public class ChatHolder extends HolderBase implements View.OnCreateContextMenuListener {
     @BindView(R.id.messageTextView)
     TextView messageTextView;
     @BindView(R.id.messageImageView)

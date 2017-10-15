@@ -30,13 +30,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.firebase.ui.auth.ui.ImeHelper;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareapps.a4teen.amigos.Abstract.BaseDialogFragment;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
+import com.squareapps.a4teen.amigos.Activities.ChatActivity;
 import com.squareapps.a4teen.amigos.Activities.ChatMediaActivity;
 import com.squareapps.a4teen.amigos.Activities.ChatMembersActivity;
 import com.squareapps.a4teen.amigos.Activities.SearchUsersActivity;
@@ -83,6 +88,18 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     private static final int REQUEST_IMAGE = 270;
     private static final int REQUEST_CHANGE_AVATAR = 271;
 
+    private ImageView navHeaderImageView;
+
+    private BroadcastReceiver mBroadcastReceiver;
+    private ValueEventListener avatarEventListener;
+
+    private String mUsername, mPhotoUrl, groupID, groupName;
+
+    private LinearLayoutManager mLinearLayoutManager;
+    private DatabaseReference mFirebaseDatabaseReference;
+    private FirebaseRecyclerAdapter<Message, ChatHolder> adapter;
+
+
     @BindView(R.id.chat_fragment_drawerLayout)
     DrawerLayout drawerLayout;
     @BindView(R.id.chat_fragment_nav_view)
@@ -100,17 +117,6 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     @BindView(R.id.chat_toolbar)
     Toolbar toolbar;
 
-    private ImageView navHeaderImageView;
-
-    private BroadcastReceiver mBroadcastReceiver;
-    private ValueEventListener avatarEventListener;
-
-    private String mUsername, mPhotoUrl, groupID, groupName;
-
-    private LinearLayoutManager mLinearLayoutManager;
-    // Firebase instance variables
-    private DatabaseReference mFirebaseDatabaseReference;
-    private FirebaseRecyclerAdapter<Message, ChatHolder> mFirebaseAdapter;
 
     @NonNull
     public static ChatFragment newInstance(Bundle bundle) {
@@ -137,7 +143,6 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mFirebaseAdapter.cleanup();
         mFirebaseDatabaseReference.removeEventListener(avatarEventListener);
     }
 
@@ -172,9 +177,6 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
         }
 
-        mLinearLayoutManager = new LinearLayoutManager(getActivity());
-        mLinearLayoutManager.setStackFromEnd(true);
-
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -206,7 +208,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
         setToolbar(toolbar, R.drawable.ic_arrow_back_black_24dp);
 
         View navheader = navigationView.getHeaderView(0);//navHeader index = 0
-        navHeaderImageView = (ImageView) navheader.findViewById(R.id.nav_header_image_view);
+        navHeaderImageView = navheader.findViewById(R.id.nav_header_image_view);
         navHeaderImageView.setImageDrawable(getResources().getDrawable(android.R.drawable.sym_def_app_icon));
 
         setupNavigationView();
@@ -214,10 +216,6 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
         if (groupID == null) throw new AssertionError();
 
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-
-        //[START initialize_recycler_view]
-        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-        //[END initialize_recycler_view]
 
         avatarEventListener = mFirebaseDatabaseReference.child(GROUPS)
                 .child(groupID)
@@ -256,50 +254,53 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
             }
         });
 
-
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<Message, ChatHolder>
-                (Message.class,
-                        R.layout.activity_chat_list_item, //layout
-                        ChatHolder.class,//viewholder
-                        mFirebaseDatabaseReference
-                                .child(MESSAGES)
-                                .child(groupID))
-
-        {
-
+        ImeHelper.setImeOnDoneListener(mMessageEditText, new ImeHelper.DonePressedListener() {
             @Override
-            protected void populateViewHolder(final ChatHolder viewHolder, Message model, int position) {
-                viewHolder.bind(model);
-
-            }
-            //[END_PopulateViewHolder]
-        };
-        //[END_firebaseRecyclerAdapter]
-
-
-        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
-                int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
-                // If the recycler view is initially being loaded or the
-                // user is at the bottom of the list, scroll to the bottom
-                // of the list to show the newly added message.
-                if (lastVisiblePosition == -1 || (positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1))) {
-                    mMessageRecyclerView.scrollToPosition(positionStart);
-                }
+            public void onDonePressed() {
+                mSendButton.performClick();
             }
         });
 
-        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mMessageRecyclerView.setAdapter(mFirebaseAdapter);
+        setAdapter();
 
         mSendButton.setOnClickListener(this);
         mAddMessageImageView.setOnClickListener(this);
-
         return view;
 
+    }
+
+    private void setAdapter() {
+        Query chatQuery = getDataRef().child(MESSAGES).child(groupID);
+
+        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Message>()
+                .setQuery(chatQuery, Message.class)
+                .setLifecycleOwner(((ChatActivity) getActivity()))
+                .build();
+
+
+        adapter = new FirebaseRecyclerAdapter<Message, ChatHolder>(options) {
+            @Override
+            protected void onBindViewHolder(ChatHolder holder, int position, Message model) {
+                holder.bind(model);
+            }
+
+            @Override
+            public ChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new ChatHolder(newItemView(parent, R.layout.activity_chat_list_item));
+            }
+        };
+
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                mMessageRecyclerView.smoothScrollToPosition(adapter.getItemCount());
+            }
+        });
+
+        mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mLinearLayoutManager.setStackFromEnd(true);
+        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mMessageRecyclerView.setAdapter(adapter);
     }
 
     private void setupNavigationView() {
@@ -336,8 +337,6 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     }
 
     private String sendMessage(Message message) {
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
-        Date date = new Date();
 
         String messageId = mFirebaseDatabaseReference
                 .child(MESSAGES)
@@ -365,7 +364,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
         map.put(GROUPS + separator +
                 groupID + separator +
-                TIMESTAMP, dateFormat.format(date));
+                TIMESTAMP, ServerValue.TIMESTAMP);
 
         getDataRef().updateChildren(map);
 
@@ -386,7 +385,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
         String photoID = sendMessage(tempMessage);
 
         Photo photo = new Photo(mPhotoUrl, getUid(), groupID, photoID);
-        photo.setTimeStamp(tempMessage.getTimeStamp());
+        photo.setTimeStamp(ServerValue.TIMESTAMP);
 
         HashMap<String, Object> map = new HashMap<>();
 
@@ -465,9 +464,8 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
                 Photo photo = new Photo(null, getUid(), groupID, photoID);
 
-                DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
-                Date date = new Date();
-                photo.setTimeStamp(dateFormat.format(date));
+
+                photo.setTimeStamp(ServerValue.TIMESTAMP);
 
                 getDataRef().child(MEDIA)
                         .child(groupID)
@@ -502,10 +500,13 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
         switch (item.getItemId()) {
 
             case R.id.add_members:
+                Bundle bundle = new Bundle();
+                bundle.putString(GROUP_ID, groupID);
+
                 Intent i = new Intent(getActivity(), SearchUsersActivity.class);
-                i.putExtra(GROUP_ID, groupID);
+                i.putExtras(bundle);
+
                 startActivity(i);
-                getActivity().finish();
                 return true;
 
             case R.id.change_name:
@@ -535,7 +536,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.chat_fragment_delete_item_menu:
-                Message message = mFirebaseAdapter.getItem(item.getOrder());
+                Message message = adapter.getItem(item.getOrder());
                 Log.d(TAG, message.getId());
 
                 HashMap<String, Object> map = new HashMap<>();

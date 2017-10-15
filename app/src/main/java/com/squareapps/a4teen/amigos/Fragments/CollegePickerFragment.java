@@ -19,7 +19,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.Query;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
+import com.squareapps.a4teen.amigos.Activities.CollegePickerActivity;
 import com.squareapps.a4teen.amigos.Activities.ProfileActivity;
 import com.squareapps.a4teen.amigos.Common.Objects.School;
 import com.squareapps.a4teen.amigos.Common.QueryPreferences;
@@ -56,26 +59,20 @@ public class CollegePickerFragment extends FragmentBase implements SchoolHolder.
         setHasOptionsMenu(true);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (adapter != null)
-            adapter.cleanup();
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.recycler_view_tool_bar, container, false);
 
-        progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
-        recyclerView = (RecyclerView) view.findViewById(R.id.course_recycler_view);
-        toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        progressBar = view.findViewById(R.id.progress_bar);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        toolbar = view.findViewById(R.id.toolbar);
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         // setToolbar(toolbar, R.drawable.ic_arrow_back_black_24dp);
 
-        adapter = getFirebaseRecyclerAdapter();
+        adapter = newAdapter();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
@@ -84,47 +81,52 @@ public class CollegePickerFragment extends FragmentBase implements SchoolHolder.
     }
 
 
-    private FirebaseRecyclerAdapter<School, SchoolHolder> getFirebaseRecyclerAdapter() {
+    private FirebaseRecyclerAdapter<School, SchoolHolder> newAdapter() {
         String query = QueryPreferences.getPrefSearchQuery(getContext());
         if (query == null) {
             return null;
         } else {
             progressBar.setVisibility(View.VISIBLE);
-            return new FirebaseRecyclerAdapter<School, SchoolHolder>(School.class,
-                    R.layout.course_list_item,
-                    SchoolHolder.class,
-                    getDataRef().child(SCHOOLS).orderByChild("Institution_Name")
-                            .startAt(query)
-                            .endAt(query + "\uf8ff")
-                            .limitToFirst(10)) {
+
+            Query dataRef = getDataRef().child(SCHOOLS).orderByChild("Institution_Name")
+                    .startAt(query)
+                    .endAt(query + "\uf8ff")
+                    .limitToFirst(10);
+
+            FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<School>()
+                    .setQuery(dataRef, School.class)
+                    .setLifecycleOwner(((CollegePickerActivity) getActivity()))
+                    .build();
+
+
+            adapter = new FirebaseRecyclerAdapter<School, SchoolHolder>(options) {
                 @Override
-                protected void populateViewHolder(SchoolHolder viewHolder, School model, int position) {
-                    viewHolder.bind(model);
+                protected void onBindViewHolder(SchoolHolder holder, int position, School model) {
+                    holder.bind(model);
                 }
-
-                @Override
-                protected void onDataChanged() {
-                    if (progressBar != null && progressBar.isShown())
-                        progressBar.setVisibility(View.GONE);
-                }
-
-
 
                 @Override
                 public SchoolHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                    LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-                    View itemView = inflater.inflate(R.layout.course_list_item, parent, false);
+                    View itemView = newItemView(parent, R.layout.course_list_item);
                     return new SchoolHolder(itemView, CollegePickerFragment.this);
+                }
 
+                @Override
+                public void onDataChanged() {
+                    if (progressBar != null && progressBar.isShown())
+                        progressBar.setVisibility(View.GONE);
                 }
             };
+
+            return adapter;
+
         }
     }
 
 
     @Override
     public void onItemClicked(View itemView, int pos) {
-        TextView schoolName = (TextView) itemView.findViewById(R.id.course_list_item_text1);
+        TextView schoolName = itemView.findViewById(R.id.course_list_item_text1);
         Intent intent = new Intent(getActivity(), ProfileActivity.class);
         intent.putExtra(COLLEGE, schoolName.getText());
         getActivity().setResult(OK, intent);
@@ -135,7 +137,7 @@ public class CollegePickerFragment extends FragmentBase implements SchoolHolder.
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.school_search_menu, menu);
+        inflater.inflate(R.menu.search_menu, menu);
 
         SearchView searchView = (SearchView) menu.findItem(R.id.menu_item_search).getActionView();
         searchView.setIconified(false);
@@ -177,7 +179,7 @@ public class CollegePickerFragment extends FragmentBase implements SchoolHolder.
     }
 
     public void updateSearch() {
-        adapter = getFirebaseRecyclerAdapter();
+        adapter = newAdapter();
         recyclerView.swapAdapter(adapter, true);
 
     }

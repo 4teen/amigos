@@ -1,21 +1,18 @@
 package com.squareapps.a4teen.amigos.Abstract;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 
-public abstract class HolderBase<T> extends RecyclerView.ViewHolder {
+public abstract class HolderBase extends RecyclerView.ViewHolder {
 
     private static final String TAG = "Viewholder";
 
@@ -41,8 +38,8 @@ public abstract class HolderBase<T> extends RecyclerView.ViewHolder {
                     .getReferenceFromUrl(url);
 
             // Load the image using Glide
-            Glide.with(itemView.getContext())
-                    .using(new FirebaseImageLoader())
+
+            GlideApp.with(itemView.getContext())
                     .load(storageReference)
                     .fitCenter()
                     .into(imageView);
@@ -51,7 +48,7 @@ public abstract class HolderBase<T> extends RecyclerView.ViewHolder {
         }
     }
 
-    public DatabaseReference getDataRef(){
+    public DatabaseReference getDataRef() {
         return FirebaseDatabase.getInstance().getReference();
     }
 }

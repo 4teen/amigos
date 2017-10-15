@@ -74,7 +74,7 @@ public class Contract {
     public static final String IMAGE_URL = "imageUrl";
     public static final String COURSES = "courses";
     public static final String SCHOOLS = "schools";
-
+    public static final String CONTACTS = "contacts";
 
     private Contract() {
 

@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 
 public class QueryPreferences {
     private static final String PREF_SEARCH_QUERY = "searchQuery";
+    private static final String PREF_USERS_SEARCH_QUERY = "usersSearch";
 
     public static String getPrefSearchQuery(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
@@ -20,5 +21,18 @@ public class QueryPreferences {
                 .edit()
                 .putString(PREF_SEARCH_QUERY, searchQuery)
                 .apply();
+    }
+
+    public static String getPrefUsersSearchQuery(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(PREF_USERS_SEARCH_QUERY, null);
+    }
+
+    public static void setPrefUsersSearchQuery(Context context, String searchQuery) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putString(PREF_USERS_SEARCH_QUERY, searchQuery)
+                .apply();
+
     }
 }

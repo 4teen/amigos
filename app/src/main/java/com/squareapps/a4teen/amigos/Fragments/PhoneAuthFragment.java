@@ -105,14 +105,14 @@ public class PhoneAuthFragment extends FragmentBase implements View.OnClickListe
         final View v = inflater.inflate(R.layout.activity_phone_auth, container, false);
         setMyView(v);
 
-        mDetailText = (TextView) v.findViewById(R.id.detail);
+        mDetailText = v.findViewById(R.id.detail);
 
-        mPhoneNumberField = (EditText) v.findViewById(R.id.field_phone_number);
-        mVerificationField = (EditText) v.findViewById(R.id.field_verification_code);
+        mPhoneNumberField = v.findViewById(R.id.field_phone_number);
+        mVerificationField = v.findViewById(R.id.field_verification_code);
 
-        mStartButton = (Button) v.findViewById(R.id.button_start_verification);
-        mVerifyButton = (Button) v.findViewById(R.id.button_verify_phone);
-        mResendButton = (Button) v.findViewById(R.id.button_resend);
+        mStartButton = v.findViewById(R.id.button_start_verification);
+        mVerifyButton = v.findViewById(R.id.button_verify_phone);
+        mResendButton = v.findViewById(R.id.button_resend);
 
 
         // Assign click listeners

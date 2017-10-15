@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import com.squareapps.a4teen.amigos.Abstract.HolderBase;
 import com.squareapps.a4teen.amigos.Common.Objects.Photo;
 
-public class MediaHolder extends HolderBase<Photo> {
+public class MediaHolder extends HolderBase {
 
 
     public MediaHolder(View itemView) {

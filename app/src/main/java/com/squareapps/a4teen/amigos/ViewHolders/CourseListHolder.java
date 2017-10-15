@@ -8,14 +8,14 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.squareapps.a4teen.amigos.Abstract.HolderBase;
-import com.squareapps.a4teen.amigos.Activities.DetailActivity;
+import com.squareapps.a4teen.amigos.Activities.CourseDetailActivity;
 import com.squareapps.a4teen.amigos.Common.Objects.Course;
 import com.squareapps.a4teen.amigos.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class CourseListHolder extends HolderBase<Course> implements View.OnClickListener, View.OnCreateContextMenuListener {
+public class CourseListHolder extends HolderBase implements View.OnClickListener, View.OnCreateContextMenuListener {
 
     /**
      * RecclerVIew.Adapter calls this class to create a viewHolder
@@ -48,8 +48,8 @@ public class CourseListHolder extends HolderBase<Course> implements View.OnClick
     public void onClick(View view) {
         callbacks.onItemSelected(getAdapterPosition(), itemView);
         Context context = view.getContext();
-        Intent intent = new Intent(context, DetailActivity.class);
-        intent.putExtra(DetailActivity.COURSEID, course.getCode());
+        Intent intent = new Intent(context, CourseDetailActivity.class);
+        intent.putExtra(CourseDetailActivity.COURSEID, course.getCode());
         context.startActivity(intent);
     }
 

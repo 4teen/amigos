@@ -1,12 +1,15 @@
 package com.squareapps.a4teen.amigos.Common.Objects;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Photo {
     private String photoUrl;
     private String owner;
     private String groupId;
     private String id;
-    private String timeStamp;
+    private Map<String, String> timeStamp;
 
     public Photo() {
     }
@@ -26,11 +29,11 @@ public class Photo {
         this.id = id;
     }
 
-    public String getTimeStamp() {
+    public Map<String, String> getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(String timeStamp) {
+    public void setTimeStamp(Map<String, String> timeStamp) {
         this.timeStamp = timeStamp;
     }
 
@@ -59,6 +62,6 @@ public class Photo {
     }
 
     public String getPhotoFilename() {
-        return "IMG_" + getClass().toString()+ ".jpg";
+        return "IMG_" + getClass().toString() + ".jpg";
     }
 }

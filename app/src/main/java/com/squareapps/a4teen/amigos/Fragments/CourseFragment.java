@@ -116,7 +116,7 @@ public class CourseFragment extends FragmentBase {
     @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.course_detail, container, false);
+        View view = inflater.inflate(R.layout.activity_course_detail, container, false);
         ButterKnife.bind(this, view);
 
         setToolbar(toolbar, R.drawable.ic_arrow_back_black_24dp);

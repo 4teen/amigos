@@ -11,9 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.firebase.ui.database.FirebaseIndexRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
+import com.squareapps.a4teen.amigos.Activities.ChatMembersActivity;
 import com.squareapps.a4teen.amigos.Common.Objects.User;
 import com.squareapps.a4teen.amigos.R;
 import com.squareapps.a4teen.amigos.ViewHolders.UserHolder;
@@ -41,10 +44,13 @@ public class ChatMembersFragment extends FragmentBase {
 
 
     private DatabaseReference myDatabaseReference;
-    private FirebaseIndexRecyclerAdapter<User, UserHolder> recyclerAdapter;
+    private FirebaseRecyclerAdapter<User, UserHolder> recyclerAdapter;
+
+    // Set up FirebaseRecyclerAdapter with the Querys
+    private static final DatabaseReference dataRef = getDataRef().child(USERS);
 
 
-    @BindView(R.id.group_list_recycler_View)
+    @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
     @BindView(R.id.chat_members_toolbar)
     Toolbar toolbar;
@@ -56,11 +62,6 @@ public class ChatMembersFragment extends FragmentBase {
         return fragment;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        recyclerAdapter.cleanup();
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,23 +91,27 @@ public class ChatMembersFragment extends FragmentBase {
 
         Log.d("group id ", param1);
 
-        DatabaseReference locationKeysDataRef = null;
-        DatabaseReference locationDataDataRef = myDatabaseReference.child(USERS);
+        Query keysRef;
         if (getAction().equals(ACTION_SEARCH_CHAT_MEMEBRS)) {
-            locationKeysDataRef = myDatabaseReference.child(MEMBERS).child(param1);
+            keysRef = myDatabaseReference.child(MEMBERS).child(param1);
         } else {
-            locationKeysDataRef = myDatabaseReference.child(STUDENTS).child(param1); //keyref - location of keys
+            keysRef = myDatabaseReference.child(STUDENTS).child(param1); //keyref - location of keys
         }
 
-        recyclerAdapter = new FirebaseIndexRecyclerAdapter<User, UserHolder>(User.class,
-                R.layout.circle_image_view,
-                UserHolder.class,
-                locationKeysDataRef,
-                locationDataDataRef) {
-            @Override
-            protected void populateViewHolder(UserHolder viewHolder, User model, int position) {
-                viewHolder.bind(model);
+        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<User>()
+                .setIndexedQuery(keysRef, dataRef, User.class)
+                .setLifecycleOwner(((ChatMembersActivity) getActivity()))
+                .build();
 
+        recyclerAdapter = new FirebaseRecyclerAdapter<User, UserHolder>(options) {
+            @Override
+            protected void onBindViewHolder(UserHolder holder, int position, User model) {
+                holder.bind(model);
+            }
+
+            @Override
+            public UserHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new UserHolder(newItemView(parent, R.layout.circle_image_view));
             }
         };
 

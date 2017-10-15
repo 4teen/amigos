@@ -10,7 +10,7 @@ import java.util.List;
  * Created by y-pol on 10/9/2017.
  */
 
-public abstract class RecyclerAdapterSelector<T, VH extends HolderBase<T>> extends RecyclerView.Adapter<VH> {
+public abstract class RecyclerAdapterSelector<T, VH extends HolderBase> extends RecyclerView.Adapter<VH> {
 
     private SparseBooleanArray selectedItems;
 

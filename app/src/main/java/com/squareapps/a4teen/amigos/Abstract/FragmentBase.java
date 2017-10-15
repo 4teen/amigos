@@ -13,12 +13,13 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -73,16 +74,24 @@ public abstract class FragmentBase extends Fragment {
         return true;
     }
 
-    public DatabaseReference getDataRef() {
+
+    public static DatabaseReference getDataRef() {
         return FirebaseDatabase.getInstance().getReference();
     }
 
-    public FirebaseUser getUser() {
+    @Nullable
+    public static FirebaseUser getUser() {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
-    public String getUid() {
+    @Nullable
+    public static String getUid() {
         return getUser().getUid();
+    }
+
+    @NonNull
+    protected static Boolean isSignedIn() {
+        return (getUser() != null);
     }
 
     @MainThread
@@ -117,15 +126,13 @@ public abstract class FragmentBase extends Fragment {
                     .getReferenceFromUrl(url);
 
             // Load the image using Glide
-            Glide.with(getContext())
-                    .using(new FirebaseImageLoader())
+            GlideApp.with(getContext())
                     .load(storageReference)
                     .fitCenter()
                     .into(imageView);
         } else {
             Glide.with(imageView.getContext())
                     .load(url)
-                    .fitCenter()
                     .into(imageView);
         }
     }
@@ -139,7 +146,13 @@ public abstract class FragmentBase extends Fragment {
                 Snackbar.LENGTH_SHORT).show();
     }
 
+    public View newItemView(ViewGroup parent, int layoutRes) {
+        return LayoutInflater.from(parent.getContext())
+                .inflate(layoutRes, parent, false);
+    }
+
     public void setMyView(View myView) {
         this.myView = myView;
     }
+
 }

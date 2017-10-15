@@ -37,6 +37,7 @@ public class SearchFormFragment extends Fragment implements View.OnClickListener
     public final static String SEARCH = "search";
     public final static String DETAIL = "detail";
     private final static String OUTPUTTYPE = "outputType";
+
     @BindView(R.id.prefix_spinner)
     Spinner prefix_spinner;
     ArrayAdapter<CharSequence> prefixSpinnerAdapter;

@@ -5,16 +5,17 @@
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_perm_identity_black_24dp"
             android:tint="@color/button_grey"
-            android:title="Profile" />
+            android:title="@string/my_profile" />
         <item
-            android:icon="@drawable/ic_favorite_black_24dp"
+            android:id="@+id/nav_add_friends"
+            android:icon="@drawable/ic_friends_add_black_24dp"
             android:tint="@color/button_grey"
-            android:title="Favorites" />
+            android:title="@string/add_friends" />
         <item
-            android:id="@+id/nav_bookmark"
+            android:id="@+id/nav_search_class"
             android:icon="@drawable/ic_search_black_24dp"
             android:tint="@color/button_grey"
-            android:title="Search Course" />
+            android:title="@string/search_class" />
     </group>
 
 </menu>

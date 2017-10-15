@@ -34,7 +34,7 @@ public class SearchCourseResultsFragment extends FragmentBase implements CourseH
 
     public static final String COURSES = "courses";
     public static final String USERS = "users";
-    @BindView(R.id.course_recycler_view)
+    @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     private List<Course> courses;
     private DatabaseReference databaseReference;
@@ -65,7 +65,7 @@ public class SearchCourseResultsFragment extends FragmentBase implements CourseH
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.course_list_recycler_view, container, false);
+        final View view = inflater.inflate(R.layout.recycler_view, container, false);
         ButterKnife.bind(this, view);
         setupAdapter();
         return view;
@@ -123,7 +123,7 @@ public class SearchCourseResultsFragment extends FragmentBase implements CourseH
         if (mode != null) {
             MenuItem menuItem = menu.findItem(R.id.menu_counter);
             menuItem.setActionView(R.layout.menu_counter);
-            TextView textView = (TextView) menuItem.getActionView().findViewById(R.id.counter);
+            TextView textView = menuItem.getActionView().findViewById(R.id.counter);
             textView.setText(String.valueOf(courseAdapter.getSelectedItemCount()));
 
         }
@@ -139,9 +139,8 @@ public class SearchCourseResultsFragment extends FragmentBase implements CourseH
 
         @Override
         public CourseHolder2 onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View v = layoutInflater.inflate(R.layout.course_list_item, parent, false);
-            return new CourseHolder2(v, SearchCourseResultsFragment.this);
+            View itemView = newItemView(parent, R.layout.course_list_item);
+            return new CourseHolder2(itemView, SearchCourseResultsFragment.this);
         }
 
         @Override

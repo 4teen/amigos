@@ -17,7 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class GroupHolder extends HolderBase<Group> implements View.OnClickListener, View.OnCreateContextMenuListener {
+public class GroupHolder extends HolderBase implements View.OnClickListener, View.OnCreateContextMenuListener {
 
 
     private static void initiateChatActivity(String groupId, String groupName, View view) {

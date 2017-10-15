@@ -111,7 +111,6 @@ public class LoginFragment extends FragmentBase {
                         .build()))
                 .setIsSmartLockEnabled(false)
                 .setAllowNewEmailAccounts(true)
-                .setTheme(R.style.AppTheme_Base)
                 .build(), RC_SIGN_IN);
     }
 

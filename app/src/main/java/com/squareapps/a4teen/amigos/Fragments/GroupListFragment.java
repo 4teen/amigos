@@ -17,9 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.firebase.ui.database.FirebaseIndexRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.squareapps.a4teen.amigos.Abstract.BaseDialogFragment;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
 import com.squareapps.a4teen.amigos.Common.Objects.Group;
@@ -43,18 +45,27 @@ public class GroupListFragment extends FragmentBase {
     public static final String TAG = "GroupListFragment";
     private final int REQUEST_GROUP = 0;
     //[START declare_RecyclerView]
-    @BindView(R.id.group_list_recycler_View)
+    @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
 
-    private FirebaseIndexRecyclerAdapter<Group, GroupHolder> groupRecyclerAdapter;
+    private FirebaseRecyclerAdapter<Group, GroupHolder> adapter;
     private DatabaseReference databaseReference;
-    //[END declare_RecyclerView]
 
+    // Set up FirebaseRecyclerAdapter with the Querys
+    private static final Query keysRef = getDataRef().child(USERS).child(getUid()).child(GROUPS);
+    private static final DatabaseReference dataRef = getDataRef().child(GROUPS);
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        groupRecyclerAdapter.cleanup();
+    public void onStart() {
+        super.onStart();
+        adapter.startListening();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 
     @Override
@@ -63,34 +74,40 @@ public class GroupListFragment extends FragmentBase {
         setRetainInstance(true);
         setHasOptionsMenu(true);
         databaseReference = getDataRef();
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.group_list_recycler_view, container, false);
+        View view = inflater.inflate(R.layout.recycler_view, container, false);
         ButterKnife.bind(this, view);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        groupRecyclerAdapter = new FirebaseIndexRecyclerAdapter<Group, GroupHolder>(Group.class,
-                R.layout.main_list_item,
-                GroupHolder.class,
-                databaseReference.child(USERS)
-                        .child(getUid())
-                        .child(GROUPS),
-                databaseReference.child(GROUPS)
-        ) {
-            @Override
-            protected void populateViewHolder(GroupHolder viewHolder, Group model, int position) {
-                viewHolder.bind(model);
-
-
-            }
-        };
-        setupAdapter();
+        setupAdapter(newAdapter());
         registerForContextMenu(mRecyclerView);
         return view;
+    }
+
+    private FirebaseRecyclerAdapter<Group, GroupHolder> newAdapter() {
+
+        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Group>()
+                .setIndexedQuery(keysRef, dataRef, Group.class)
+                .build();
+
+        adapter = new FirebaseRecyclerAdapter<Group, GroupHolder>(options) {
+
+            @Override
+            public GroupHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new GroupHolder(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.main_list_item, parent, false));
+            }
+
+            @Override
+            protected void onBindViewHolder(GroupHolder holder, int position, Group model) {
+                holder.bind(model);
+            }
+        };
+        return adapter;
     }
 
     @Override
@@ -151,7 +168,7 @@ public class GroupListFragment extends FragmentBase {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         Log.d(TAG, "onContextItemSelected was called");
-        Group group = groupRecyclerAdapter.getItem(item.getOrder());
+        Group group = adapter.getItem(item.getOrder());
         switch (item.getItemId()) {
             case R.id.delete_group_context_menu:
                 HashMap<String, Object> map = new HashMap<>();
@@ -166,9 +183,9 @@ public class GroupListFragment extends FragmentBase {
 
     }
 
-    public void setupAdapter() {
+    public void setupAdapter(FirebaseRecyclerAdapter<Group, GroupHolder> adapter) {
         if (isAdded()) {
-            mRecyclerView.setAdapter(groupRecyclerAdapter);
+            mRecyclerView.setAdapter(adapter);
             Log.d("setAdapter", "GroupViewHolder was called");
         }
     }

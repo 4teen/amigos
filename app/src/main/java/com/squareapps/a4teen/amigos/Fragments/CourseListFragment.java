@@ -13,14 +13,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.squareapps.a4teen.amigos.Abstract.FireBaseIndexRecyclerAdapterSelector;
+import com.google.firebase.database.Query;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
 import com.squareapps.a4teen.amigos.Activities.LoginActivity;
+import com.squareapps.a4teen.amigos.Activities.MainActivity;
 import com.squareapps.a4teen.amigos.Activities.SearchFormActivity;
 import com.squareapps.a4teen.amigos.Common.Objects.Course;
 import com.squareapps.a4teen.amigos.R;
@@ -39,24 +40,27 @@ import static java.io.File.separator;
 
 public class CourseListFragment extends FragmentBase implements CourseListHolder.Callbacks {
 
-    //[START declare_RecyclerView]
-    @BindView(R.id.course_recycler_view)
+    private FirebaseRecyclerAdapter<Course, CourseListHolder> adapter;
+
+    // Set up FirebaseRecyclerAdapter with the Querys
+    private static final Query keysRef = getDataRef().child(USERS).child(getUid()).child(COURSES);
+    private static final DatabaseReference dataRef = getDataRef().child(COURSES);
+
+    @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
-    //[END declare_RecyclerView]
 
-    private FireBaseIndexRecyclerAdapterSelector<Course, CourseListHolder> adapter;
-
-    // FirebaseRecyclerAdapter<Course, CourseListHolder> recyclerAdapter;
-
-    private FirebaseUser user;
-
-    private DatabaseReference databaseReference;
-
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        adapter.cleanup();
+    public void onStart() {
+        super.onStart();
+        if (getUser() == null) {
+            // Not signed in, launch the Sign In activity
+            startActivity(new Intent(getActivity(), LoginActivity.class));
+            getActivity().finish();
+        }
+
     }
 
     @Override
@@ -64,59 +68,54 @@ public class CourseListFragment extends FragmentBase implements CourseListHolder
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         setRetainInstance(true);
-
-        FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
-        user = mFirebaseAuth.getCurrentUser();
-        if (user == null) {
-            // Not signed in, launch the Sign In activity
-            startActivity(new Intent(getActivity(), LoginActivity.class));
-            getActivity().finish();
-            return;
-        }
-
-        databaseReference = FirebaseDatabase
-                .getInstance()
-                .getReference();
-
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.course_list_recycler_view, container, false);
+        View view = inflater.inflate(R.layout.course_list_fragment, container, false);
         ButterKnife.bind(this, view);
 
-        //[START initialize RecyclerView]
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //[END initialize_RecyclerView]
-
-        adapter = new FireBaseIndexRecyclerAdapterSelector<Course, CourseListHolder>(
-                Course.class,
-                R.layout.course_list_item,
-                CourseListHolder.class,
-                databaseReference.child(USERS).child(user.getUid()).child(COURSES),
-                databaseReference.child(COURSES)
-        ) {
-            @Override
-            protected void populateViewHolder(CourseListHolder viewHolder, Course model, int position) {
-                viewHolder.bind(model);
-            }
-
-            @Override
-            public CourseListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View itemView = LayoutInflater.from(getContext()).inflate(R.layout.course_list_item, parent, false);
-                return new CourseListHolder(itemView, CourseListFragment.this);
-            }
-        };
+        registerForContextMenu(mRecyclerView);
 
         setupAdapter();
-        registerForContextMenu(mRecyclerView);
 
         return view;
     }
 
+    @NonNull
+    private FirebaseRecyclerAdapter<Course, CourseListHolder> newAdapter() {
+
+        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Course>()
+                .setIndexedQuery(keysRef, dataRef, Course.class)
+                .setLifecycleOwner((MainActivity) getActivity())
+                .build();
+
+        adapter = new FirebaseRecyclerAdapter<Course, CourseListHolder>(options) {
+            @Override
+            protected void onBindViewHolder(CourseListHolder holder, int position, Course model) {
+                holder.bind(model);
+            }
+
+            @Override
+            public CourseListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new CourseListHolder(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.course_list_item, parent, false), CourseListFragment.this);
+            }
+
+            @Override
+            public void onDataChanged() {
+                if (progressBar != null && progressBar.isShown())
+                    progressBar.setVisibility(View.GONE);
+            }
+        };
+        return adapter;
+    }
+
     private void setupAdapter() {
         if (isAdded()) {
-            mRecyclerView.setAdapter(adapter);
+            progressBar.setVisibility(View.VISIBLE);
+            mRecyclerView.setAdapter(newAdapter());
         }
     }
 
@@ -171,5 +170,7 @@ public class CourseListFragment extends FragmentBase implements CourseListHolder
         //   adapter.toggleSelection(pos);
         //   itemView.setActivated(adapter.isSelected(pos));
     }
+
+
 }
 

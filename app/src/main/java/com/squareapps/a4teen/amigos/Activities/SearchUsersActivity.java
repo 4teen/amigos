@@ -2,31 +2,26 @@ package com.squareapps.a4teen.amigos.Activities;
 
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import com.squareapps.a4teen.amigos.Abstract.SingleFragmentActivity;
+import com.squareapps.a4teen.amigos.Fragments.SearchContactsFragment;
 import com.squareapps.a4teen.amigos.Fragments.SearchUsersFragment;
+
+import static com.squareapps.a4teen.amigos.Common.Contract.PHONE_NUMBER;
 
 
 public class SearchUsersActivity extends SingleFragmentActivity {
 
-    private SearchUsersFragment searchUsersFragment;
-
     @NonNull
     @Override
     protected Fragment createFragment() {
-        searchUsersFragment = SearchUsersFragment.newInstance(getIntent().getStringExtra("groupID"));
-        return searchUsersFragment;
+        String searchBy = getIntent().getStringExtra(SearchUsersFragment.EXTRA_SEARCH_BY);
+        if (searchBy.equals(PHONE_NUMBER))
+            return SearchContactsFragment.newInstance(getIntent().getExtras());
+        else
+            return SearchUsersFragment.newInstance(getIntent().getExtras());
     }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        searchUsersFragment.handleIntent(intent);
-    }
-
-
 
 
 }

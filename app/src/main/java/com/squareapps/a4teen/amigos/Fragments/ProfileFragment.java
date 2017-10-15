@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -69,21 +68,6 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
 
     private BroadcastReceiver mBroadcastReceiver;
 
-    @BindView(R.id.profile_image_circleImageView)
-    ImageView imageViewCircle;
-    @BindView(R.id.profile_name_editText)
-    EditText name;
-    @BindView(R.id.birthdate_edit_text)
-    TextView birtdate;
-    @BindView(R.id.cellphone_text_view)
-    TextView cellphone;
-    @BindView(R.id.profile_fab)
-    FloatingActionButton fab;
-    @BindView(R.id.school_text_view)
-    TextView school;
-    @BindView(R.id.gender_edit_text)
-    EditText gender;
-
     private ValueEventListener valueEventListener;
     private DatabaseReference myref;
     private String avatarUrl;
@@ -92,6 +76,28 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
     private Uri mDownloadUrl = null;
     private Uri mFileUri = null;
     private File mPhotoFile;
+
+    @BindView(R.id.profile_image_circleImageView)
+    ImageView imageViewCircle;
+
+    @BindView(R.id.profile_fab)
+    FloatingActionButton fab;
+
+    @BindView(R.id.profile_name_text_view)
+    TextView name;
+
+    @BindView(R.id.profile_birthday_text_view)
+    TextView birtdate;
+
+    @BindView(R.id.profile_phone_text_view)
+    TextView cellphone;
+
+    @BindView(R.id.profile_school_text_view)
+    TextView school;
+
+    @BindView(R.id.profile_gender_text_view)
+    TextView gender;
+
 
     public static ProfileFragment newInstance(Bundle bundle) {
         ProfileFragment fragment = new ProfileFragment();
@@ -162,7 +168,7 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_profile, container, false);
+        View view = inflater.inflate(R.layout.profile_detail, container, false);
         ButterKnife.bind(this, view);
 
         valueEventListener = myref.child(USERS)
@@ -219,13 +225,13 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.birthdate_edit_text:
+            case R.id.profile_birthday_text_view:
                 datePickerDialog.show();
                 break;
             case R.id.profile_fab:
                 v.showContextMenu();
                 break;
-            case R.id.cellphone_text_view:
+            case R.id.profile_phone_text_view:
                 Bundle bundle = new Bundle();
                 bundle.putString(PHONE_NUMBER, cellphone.getText().toString());
 
@@ -234,7 +240,7 @@ public class ProfileFragment extends FragmentBase implements View.OnClickListene
 
                 getActivity().startActivityForResult(phoneAuth, REQUEST_CELLPHONE);
                 break;
-            case R.id.school_text_view:
+            case R.id.profile_school_text_view:
                 Intent collegePicker = new Intent(getActivity(), CollegePickerActivity.class);
                 startActivityForResult(collegePicker, REQUEST_COLLEGE);
                 break;
