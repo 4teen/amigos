@@ -1,11 +1,13 @@
 package com.squareapps.a4teen.amigos.Abstract;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -21,7 +23,7 @@ public abstract class HolderBase extends RecyclerView.ViewHolder {
     }
 
 
-    protected void setImageView(String url, ImageView imageView) {
+    protected void setImageView(final Context context, final String url, final ImageView imageView) {
         if (url == null) {
             Log.e(TAG, "imageUrl is null");
             return;
@@ -30,25 +32,29 @@ public abstract class HolderBase extends RecyclerView.ViewHolder {
             return;
         }
 
-        url = Uri.decode(url);
+        final String decodedUrl = Uri.decode(url);
 
         if (url.startsWith("gs")) {
             StorageReference storageReference = FirebaseStorage
                     .getInstance()
-                    .getReferenceFromUrl(url);
+                    .getReferenceFromUrl(decodedUrl);
 
             // Load the image using Glide
 
-            GlideApp.with(itemView.getContext())
+           /* GlideApp.with(context.getApplicationContext())
                     .load(storageReference)
                     .fitCenter()
-                    .into(imageView);
+                    .into(imageView);*/
         } else {
             Log.e(TAG, "imageUrl does not start with gs");
         }
     }
 
-    public DatabaseReference getDataRef() {
+    public static DatabaseReference getDataRef() {
         return FirebaseDatabase.getInstance().getReference();
+    }
+
+    public static String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 }

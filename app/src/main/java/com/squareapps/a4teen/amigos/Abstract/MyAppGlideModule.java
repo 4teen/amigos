@@ -11,13 +11,15 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.InputStream;
 
-
 /**
  * Glide module to register {@link com.firebase.ui.storage.images.FirebaseImageLoader}.
  * See: http://bumptech.github.io/glide/doc/generatedapi.html
  */
 @GlideModule
 public class MyAppGlideModule extends AppGlideModule {
+
+
+
     @Override
     public void registerComponents(Context context, Glide glide, Registry registry) {
         // Register FirebaseImageLoader to handle StorageReference

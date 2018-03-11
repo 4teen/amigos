@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="contact"
+            type="com.squareapps.a4teen.amigos.Common.POJOS.User" />
+
+
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight">
+
+        <!-- Use standard android.R class icon id instead of app specific id. This is just useful for
+             consistency. Use scaleType=centerCrop to give a nice full cropped image in the assigned
+             space -->
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="?android:attr/listPreferredItemHeight"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:src="@mipmap/ic_face_black"
+            app:error="@{@drawable/ic_broken_image_black_24dp}"
+            app:imageUrl="@{contact.avatarUrl}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/avatar_image_view" />
+
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@android:id/text2"
+            android:layout_alignParentTop="true"
+            android:layout_alignWithParentIfMissing="true"
+            android:ellipsize="marquee"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:text="@{contact.getHighlightedNameTextSpan(context) ?? contact.name}"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            app:layout_constraintStart_toEndOf="@+id/avatar"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@android:id/text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:fontFamily="sans-serif"
+            android:singleLine="true"
+            android:text="@{contact.email}"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/avatar"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintVertical_bias="1.0" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

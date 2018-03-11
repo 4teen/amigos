@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Strings related to Settings -->
+
+    <!-- General settings -->
+    <string name="pref_header_general">General</string>
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your body history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Doe</string>
+
+    <string name="pref_title_gender">Gender</string>
+    <string-array name="pref_general_gender_options">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
+    <string-array name="pref_general_gender_values">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
+    <!--General settings keys-->
+    <string name="key_display_name" translatable="false">KEY_DISPLAY_NAME</string>
+    <string name="key_gender" translatable="false">KEY_GENDER</string>
+
+    <!-- settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- settings for Notifications -->
+    notifications_new_message_vibrate
+    <string name="notifications_new_message_vibrate" translatable="false">KEY_NOTIFICATIONS_VIBRATE</string>
+    <string name="notifications_new_message_ringtone" translatable="false">KEY_NOTIFICATIONS_RINGTONE</string>
+    <string name="pref_header_notifications">Notifications</string>
+    <string name="pref_title_groups_notifications">Groups notifications</string>
+    <string name="pref_title_ringtone">Group ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+    <string name="pref_title_vibrate">Vibrate</string>
+
+
+</resources>

@@ -1,45 +1,26 @@
 package com.squareapps.a4teen.amigos.ViewHolders;
 
+import android.databinding.DataBindingUtil;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.TextView;
 
-import com.squareapps.a4teen.amigos.Abstract.HolderBase;
-import com.squareapps.a4teen.amigos.Common.Objects.School;
-import com.squareapps.a4teen.amigos.Fragments.CollegePickerFragment;
-import com.squareapps.a4teen.amigos.R;
+import com.squareapps.a4teen.amigos.databinding.SchoolListItemBinding;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+/**
+ * Created by y-pol on 1/7/2018.s
+ */
 
-public class SchoolHolder extends HolderBase implements View.OnClickListener {
+public class SchoolHolder extends RecyclerView.ViewHolder {
+    private SchoolListItemBinding binding;
 
-    @BindView(R.id.course_list_item_text1)
-    TextView mTitleTextView;
-    @BindView(R.id.course_list_item_text2)
-    TextView mSubtitleTextView;
 
-    private Callback callback;
-
-    public interface Callback {
-        void onItemClicked(View itemView, int pos);
-    }
-
-    public SchoolHolder(View itemView, CollegePickerFragment fragment) {
+    public SchoolHolder(View itemView) {
         super(itemView);
-        ButterKnife.bind(this, itemView);
-        itemView.setOnClickListener(this);
-
-        callback = fragment;
+        binding = DataBindingUtil.bind(itemView);
     }
 
-    public void bind(School model) {
-        mTitleTextView.setText(model.getInstitution_Name());
-        mSubtitleTextView.setText(model.getCampus_Name());
-
+    public SchoolListItemBinding getBinding() {
+        return binding;
     }
 
-    @Override
-    public void onClick(View v) {
-        callback.onItemClicked(v, getAdapterPosition());
-    }
 }

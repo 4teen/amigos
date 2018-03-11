@@ -1,7 +1,5 @@
 package com.squareapps.a4teen.amigos.Fragments;
 
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,10 +27,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import com.firebase.ui.auth.ui.ImeHelper;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,38 +43,38 @@ import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
 import com.squareapps.a4teen.amigos.Activities.ChatActivity;
 import com.squareapps.a4teen.amigos.Activities.ChatMediaActivity;
 import com.squareapps.a4teen.amigos.Activities.ChatMembersActivity;
+import com.squareapps.a4teen.amigos.Activities.MainActivity;
 import com.squareapps.a4teen.amigos.Activities.SearchUsersActivity;
-import com.squareapps.a4teen.amigos.Common.Objects.Message;
-import com.squareapps.a4teen.amigos.Common.Objects.Photo;
-import com.squareapps.a4teen.amigos.DialogFragments.ChangeNameDialogFragment;
+import com.squareapps.a4teen.amigos.Common.POJOS.Message;
+import com.squareapps.a4teen.amigos.Common.POJOS.Photo;
+import com.squareapps.a4teen.amigos.Common.Utils.AppPreferences;
+import com.squareapps.a4teen.amigos.Common.Utils.CustomDataBindingAdapters;
 import com.squareapps.a4teen.amigos.R;
-import com.squareapps.a4teen.amigos.UploadService;
+import com.squareapps.a4teen.amigos.Services.UploadService;
+import com.squareapps.a4teen.amigos.Settings.GroupSettingsActivity;
 import com.squareapps.a4teen.amigos.ViewHolders.ChatHolder;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
-import static com.squareapps.a4teen.amigos.Common.Contract.AVATAR_URL;
 import static com.squareapps.a4teen.amigos.Common.Contract.GROUPS;
-import static com.squareapps.a4teen.amigos.Common.Contract.GROUP_ID;
-import static com.squareapps.a4teen.amigos.Common.Contract.GROUP_NAME;
+import static com.squareapps.a4teen.amigos.Common.Contract.Group.GROUP_ID;
+import static com.squareapps.a4teen.amigos.Common.Contract.Group.GROUP_NAME;
 import static com.squareapps.a4teen.amigos.Common.Contract.IMAGE_URL;
 import static com.squareapps.a4teen.amigos.Common.Contract.MEDIA;
+import static com.squareapps.a4teen.amigos.Common.Contract.MEMBERS;
 import static com.squareapps.a4teen.amigos.Common.Contract.MESSAGE;
 import static com.squareapps.a4teen.amigos.Common.Contract.MESSAGES;
-import static com.squareapps.a4teen.amigos.Common.Contract.NAME;
 import static com.squareapps.a4teen.amigos.Common.Contract.PATH;
-import static com.squareapps.a4teen.amigos.Common.Contract.PHOTO_URL;
 import static com.squareapps.a4teen.amigos.Common.Contract.TIMESTAMP;
-import static com.squareapps.a4teen.amigos.Fragments.SearchCourseResultsFragment.USERS;
-import static com.squareapps.a4teen.amigos.UploadService.EXTRA_FILE_URI;
+import static com.squareapps.a4teen.amigos.Common.Contract.USERS;
+import static com.squareapps.a4teen.amigos.Common.Contract.User.AVATAR_URL;
+import static com.squareapps.a4teen.amigos.Common.Contract.User.NAME;
+import static com.squareapps.a4teen.amigos.Common.Contract.User.PHOTO_URL;
+import static com.squareapps.a4teen.amigos.Services.UploadService.EXTRA_FILE_URI;
 import static java.io.File.separator;
 
 
@@ -86,20 +85,6 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     private static final String TAG = "ChatFragment";
     private static final int REQUEST_CHANGE_NAME = 269;
     private static final int REQUEST_IMAGE = 270;
-    private static final int REQUEST_CHANGE_AVATAR = 271;
-
-    private ImageView navHeaderImageView;
-
-    private BroadcastReceiver mBroadcastReceiver;
-    private ValueEventListener avatarEventListener;
-
-    private String mUsername, mPhotoUrl, groupID, groupName;
-
-    private LinearLayoutManager mLinearLayoutManager;
-    private DatabaseReference mFirebaseDatabaseReference;
-    private FirebaseRecyclerAdapter<Message, ChatHolder> adapter;
-
-
     @BindView(R.id.chat_fragment_drawerLayout)
     DrawerLayout drawerLayout;
     @BindView(R.id.chat_fragment_nav_view)
@@ -116,12 +101,19 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     ImageView mAddMessageImageView;
     @BindView(R.id.chat_toolbar)
     Toolbar toolbar;
-
+    private ImageView navHeaderImageView;
+    private BroadcastReceiver mBroadcastReceiver;
+    private ValueEventListener avatarEventListener;
+    private String mUsername, mPhotoUrl, groupID, groupName, groupAvatar;
+    private DatabaseReference mFirebaseDatabaseReference;
+    private FirebaseRecyclerAdapter<Message, ChatHolder> adapter;
 
     @NonNull
     public static ChatFragment newInstance(Bundle bundle) {
         ChatFragment chatFragment = new ChatFragment();
         chatFragment.setArguments(bundle);
+        if (bundle.getString(GROUP_ID) == null)
+            throw new AssertionError();
         return chatFragment;
     }
 
@@ -137,13 +129,16 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     public void onStop() {
         super.onStop();
         // Unregister download receiver
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
+        LocalBroadcastManager.getInstance(getActivity())
+                .unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mFirebaseDatabaseReference.removeEventListener(avatarEventListener);
+        mFirebaseDatabaseReference
+                .child(GROUP_ID)
+                .removeEventListener(avatarEventListener);
     }
 
     @Override
@@ -152,10 +147,12 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
         outState.putAll(getArguments());
     }
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
 
         Bundle bundle = getArguments();
 
@@ -163,10 +160,9 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
             groupName = savedInstanceState.getString(GROUP_NAME);
             groupID = savedInstanceState.getString(GROUP_ID);
         } else if (bundle != null) {
-            groupName = bundle.getString(GROUP_NAME);
             groupID = bundle.getString(GROUP_ID);
+            groupName = AppPreferences.getPrefGroupName(getContext(), groupID);
         }
-
 
         mFirebaseDatabaseReference = getDataRef();
 
@@ -197,7 +193,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, final Bundle
             savedInstanceState) {
         final View view = inflater.inflate(R.layout.activity_chat, container, false);
         ButterKnife.bind(this, view);
@@ -207,24 +203,35 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
         setToolbar(toolbar, R.drawable.ic_arrow_back_black_24dp);
 
-        View navheader = navigationView.getHeaderView(0);//navHeader index = 0
+        final View navheader = navigationView.getHeaderView(0);//navHeader index = 0
         navHeaderImageView = navheader.findViewById(R.id.nav_header_image_view);
-        navHeaderImageView.setImageDrawable(getResources().getDrawable(android.R.drawable.sym_def_app_icon));
+        navHeaderImageView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
 
         setupNavigationView();
-
-        if (groupID == null) throw new AssertionError();
 
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
         avatarEventListener = mFirebaseDatabaseReference.child(GROUPS)
                 .child(groupID)
-                .child(AVATAR_URL)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.getValue() != null)
-                            setImageView(dataSnapshot.getValue().toString(), navHeaderImageView);
+                        if (dataSnapshot.getValue() != null) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                final String key = snapshot.getKey();
+                                if (key.equals(AVATAR_URL) && isAdded()) {
+                                    String avatar = snapshot.getValue(String.class);
+                                    CustomDataBindingAdapters.loadImage(navHeaderImageView, avatar,
+                                            getResources().getDrawable(R.drawable.ic_broken_image_black_24dp));
+                                    groupAvatar = avatar;
+                                } else if (key.equals(NAME) && isAdded()) {
+                                    String newname = snapshot.getValue(String.class);
+                                    ((TextView) navheader.findViewById(android.R.id.text1))
+                                            .setText(newname);
+                                    toolbar.setTitle(newname);
+                                }
+                            }
+                        }
                     }
 
                     @Override
@@ -254,14 +261,11 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
             }
         });
 
-        ImeHelper.setImeOnDoneListener(mMessageEditText, new ImeHelper.DonePressedListener() {
-            @Override
-            public void onDonePressed() {
-                mSendButton.performClick();
-            }
-        });
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mLinearLayoutManager.setStackFromEnd(true);
+        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
 
-        setAdapter();
+        mMessageRecyclerView.setAdapter(newAdapter());
 
         mSendButton.setOnClickListener(this);
         mAddMessageImageView.setOnClickListener(this);
@@ -269,7 +273,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
 
     }
 
-    private void setAdapter() {
+    private FirebaseRecyclerAdapter<Message, ChatHolder> newAdapter() {
         Query chatQuery = getDataRef().child(MESSAGES).child(groupID);
 
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Message>()
@@ -281,13 +285,21 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
         adapter = new FirebaseRecyclerAdapter<Message, ChatHolder>(options) {
             @Override
             protected void onBindViewHolder(ChatHolder holder, int position, Message model) {
-                holder.bind(model);
+                holder.getBinding().setMessage(model);
+                holder.getBinding().executePendingBindings();
             }
 
             @Override
             public ChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 return new ChatHolder(newItemView(parent, R.layout.activity_chat_list_item));
             }
+
+            @Override
+            public void onViewRecycled(ChatHolder holder) {
+                super.onViewRecycled(holder);
+                holder.clearImageHolders();
+            }
+
         };
 
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
@@ -296,43 +308,67 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
                 mMessageRecyclerView.smoothScrollToPosition(adapter.getItemCount());
             }
         });
+        return adapter;
 
-        mLinearLayoutManager = new LinearLayoutManager(getActivity());
-        mLinearLayoutManager.setStackFromEnd(true);
-        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mMessageRecyclerView.setAdapter(adapter);
     }
 
     private void setupNavigationView() {
         // Set behavior of Navigation drawer
+        // This method will trigger on item Click of navigation menu
         navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    // This method will trigger on item Click of navigation menu
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        // Set item in checked state
-                        menuItem.setChecked(true);
+                menuItem -> {
+                    // Set item in checked state
+                    menuItem.setChecked(true);
 
-                        switch (menuItem.getItemId()) {
+                    switch (menuItem.getItemId()) {
 
-                            case R.id.chat_fragment_nav_members:
-                                Intent searchForm = new Intent(getActivity(), ChatMembersActivity.class);
-                                searchForm.setAction(ChatMembersFragment.ACTION_SEARCH_CHAT_MEMEBRS);
-                                searchForm.putExtra(ChatMembersFragment.EXTRA_PARAM1, groupID);
-                                startActivity(searchForm);
-                                break;
-                            case R.id.chat_fragment_nav_media:
-                                Intent chatMedia = new Intent(getActivity(), ChatMediaActivity.class);
-                                chatMedia.putExtra(ChatMediaFragment.PARAM1, groupID);
-                                startActivity(chatMedia);
-                                break;
+                        case R.id.chat_fragment_nav_members:
+                            Intent searchForm = new Intent(getActivity(), ChatMembersActivity.class);
+                            searchForm.setAction(ChatMembersFragment.ACTION_SEARCH_CHAT_MEMEBRS);
+                            searchForm.putExtra(ChatMembersFragment.EXTRA_PARAM1, groupID);
+                            startActivity(searchForm);
+                            break;
+                        case R.id.chat_fragment_nav_media:
+                            Intent chatMedia = new Intent(getActivity(), ChatMediaActivity.class);
+                            chatMedia.putExtra(ChatMediaFragment.PARAM1, groupID);
+                            startActivity(chatMedia);
+                            break;
 
-                        }
+                        case R.id.chat_fragment_nav_add_user:
 
-                        // Closing drawer on item click
-                        drawerLayout.closeDrawers();
-                        return true;
+                            Intent i = new Intent(getActivity(), SearchUsersActivity.class);
+                            i.putExtra(SearchUsersFragment.EXTRA_SEARCH_BY, NAME);
+
+                            i.putExtra(GROUP_ID, groupID);
+                            i.putExtra(GROUP_NAME, groupName);
+                            i.putExtra("groupAvatar", groupAvatar);
+                            i.putExtra("senderUid", getUid());
+                            i.putExtra("senderName", FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                            i.putExtra("senderAvatarUrl", getAvatarUrl());
+                            startActivity(i);
+                            break;
+
+                        case R.id.chat_fragment_nav_leave_group:
+                            getDataRef().child(GROUPS).child(groupID).child(MEMBERS).child(getUid()).removeValue();
+
+                            Intent main = new Intent(getActivity(), MainActivity.class);
+                            startActivity(main);
+                            getActivity().finish();
+
+                            break;
+
+                        case R.id.settings:
+                            Intent settingsIntent = new Intent(getContext(), GroupSettingsActivity.class);
+                            settingsIntent.putExtra(GROUP_ID, groupID);
+                            settingsIntent.putExtra(AVATAR_URL, groupAvatar);
+                            startActivity(settingsIntent);
+                            break;
+
                     }
+
+                    // Closing drawer on item click
+                    drawerLayout.closeDrawers();
+                    return true;
                 });
     }
 
@@ -385,7 +421,7 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
         String photoID = sendMessage(tempMessage);
 
         Photo photo = new Photo(mPhotoUrl, getUid(), groupID, photoID);
-        photo.setTimeStamp(ServerValue.TIMESTAMP);
+        //photo.setTimeStamp(ServerValue.TIMESTAMP);
 
         HashMap<String, Object> map = new HashMap<>();
 
@@ -455,34 +491,6 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
                 }
 
                 break;
-            case REQUEST_CHANGE_AVATAR:
-                final Uri avatarFile = data.getData();
-
-                String photoID = getDataRef().child(MEDIA)
-                        .child(groupID)
-                        .push().getKey();
-
-                Photo photo = new Photo(null, getUid(), groupID, photoID);
-
-
-                photo.setTimeStamp(ServerValue.TIMESTAMP);
-
-                getDataRef().child(MEDIA)
-                        .child(groupID)
-                        .child(photoID)
-                        .setValue(photo);
-
-                String update1 = MEDIA + separator +
-                        groupID + separator +
-                        photoID + separator +
-                        PHOTO_URL;
-
-                String update2 = GROUPS + separator +
-                        groupID + separator +
-                        AVATAR_URL;
-
-                uploadImage(avatarFile, photoID, update1, update2);
-                break;
 
             default:
         }
@@ -498,38 +506,14 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
-            case R.id.add_members:
-                Bundle bundle = new Bundle();
-                bundle.putString(GROUP_ID, groupID);
-
-                Intent i = new Intent(getActivity(), SearchUsersActivity.class);
-                i.putExtras(bundle);
-
-                startActivity(i);
-                return true;
-
-            case R.id.change_name:
-                FragmentManager fragmentManager = getFragmentManager();
-                ChangeNameDialogFragment changeNameDialogFragment = new ChangeNameDialogFragment();
-                changeNameDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.AppTheme);
-                changeNameDialogFragment.setTargetFragment(this, REQUEST_CHANGE_NAME);
-                changeNameDialogFragment.show(fragmentManager, "CHANGE NAME DIALOG FRAGMENT");
-                return true;
-
-
-            case R.id.change_avatar:
-                dispatchPictureIntent(REQUEST_CHANGE_AVATAR);
-                break;
-
             case R.id.menu:
                 drawerLayout.openDrawer(GravityCompat.END);
-                break;
-
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
+
         }
-        return super.onOptionsItemSelected(item);
+
     }
 
     @Override
@@ -601,6 +585,5 @@ public class ChatFragment extends FragmentBase implements View.OnClickListener {
         intent.setType("image/*");
         startActivityForResult(intent, requestCode);
     }
-
 
 }

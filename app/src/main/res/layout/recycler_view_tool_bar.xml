@@ -15,7 +15,9 @@
 
     </android.support.design.widget.AppBarLayout>
 
+
     <include layout="@layout/recycler_view" />
+
 
     <include
         layout="@layout/progress_bar"

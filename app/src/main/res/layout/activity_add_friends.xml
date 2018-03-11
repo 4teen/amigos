@@ -20,15 +20,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
-
     <include
         layout="@layout/progress_bar"
         android:visibility="gone" />
@@ -48,44 +39,47 @@
             android:showDividers="middle"
             android:shrinkColumns="1">
 
-            <TableRow android:foreground="@drawable/lb_selectable_item_rounded_rect">
+            <TableRow>
 
                 <ImageButton
                     style="@style/AppTheme.TableRow.Left"
+                    android:layout_gravity="center"
                     android:background="@color/white"
                     android:src="@drawable/ic_search_black_24dp" />
 
                 <TextView
                     android:id="@+id/search_email_textView"
-                    style="@style/AppTheme.TableRow.Right"
-                    android:text="@string/search_friend_by_e_mail" />
+                    style="@style/AppTheme.TableRow.AddFriend.Right"
+                    android:text="@string/search_by_e_mail" />
 
             </TableRow>
 
-            <TableRow android:foreground="@drawable/lb_selectable_item_rounded_rect">
+            <TableRow>
 
                 <ImageButton
                     style="@style/AppTheme.TableRow.Left"
+                    android:layout_gravity="center"
                     android:background="@color/white"
                     android:src="@drawable/ic_person_name_black_24dp" />
 
                 <TextView
                     android:id="@+id/search_name_textView"
-                    style="@style/AppTheme.TableRow.Right"
+                    style="@style/AppTheme.TableRow.AddFriend.Right"
                     android:text="@string/search_by_name" />
 
             </TableRow>
 
-            <TableRow android:foreground="@drawable/lb_selectable_item_rounded_rect">
+            <TableRow>
 
                 <ImageButton
                     style="@style/AppTheme.TableRow.Left"
+                    android:layout_gravity="center"
                     android:background="@color/white"
                     android:src="@drawable/ic_phone_android_black_24dp" />
 
                 <TextView
                     android:id="@+id/search_contact_textView"
-                    style="@style/AppTheme.TableRow.Right"
+                    style="@style/AppTheme.TableRow.AddFriend.Right"
                     android:text="@string/search_contact" />
 
             </TableRow>

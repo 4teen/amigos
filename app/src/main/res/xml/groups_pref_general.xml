@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="@string/key_general_group_settings"
+        android:title="@string/title_general_group_settings">
+
+        <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+        <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+        <com.squareapps.a4teen.amigos.Abstract.GroupNamePreference
+            android:capitalize="words"
+            android:defaultValue="@string/default_group_name"
+            android:inputType="textCapWords"
+            android:key="@string/key_group_name"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Group name" />
+
+
+        <com.squareapps.a4teen.amigos.Abstract.ChangeGroupAvatarPreference
+            android:key="@string/key_group_avatar"
+            android:layout="@layout/image_view_object_preference"
+            android:title="@string/change_avatar" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="@string/title_rigntone_settings"
+        android:title="@string/pref_title_ringtone">
+
+        <!-- A 'parent' preference, which enables/disables child preferences (below)
+            when checked/unchecked. -->
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/key_allow_notifications"
+            android:title="@string/pref_title_groups_notifications" />
+
+        <!-- Allows the user to choose a ringtone in the 'notification' category. -->
+        <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
+        <!-- NOTE: RingtonePreference's summary should be set to its value by the activity code. -->
+        <RingtonePreference
+            android:dependency="@string/key_allow_notifications"
+            android:key="@string/notifications_new_message_ringtone"
+            android:ringtoneType="notification"
+            android:title="@string/pref_title_ringtone" />
+
+        <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
+        <SwitchPreference
+            android:defaultValue="true"
+            android:dependency="@string/key_allow_notifications"
+            android:key="@string/notifications_new_message_vibrate"
+            android:title="@string/pref_title_vibrate" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

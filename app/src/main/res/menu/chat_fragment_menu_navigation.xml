@@ -1,16 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
+    <item
+        android:id="@+id/item1"
+        android:title="@string/places">
+        <group android:checkableBehavior="single">
+            <item
+                android:id="@+id/chat_fragment_nav_members"
+                android:icon="@drawable/ic_group_black_24dp"
+                android:tint="@color/button_grey"
+                android:title="@string/members" />
+            <item
+                android:id="@+id/chat_fragment_nav_media"
+                android:icon="@drawable/ic_perm_media_black_24dp"
+                android:tint="@color/button_grey"
+                android:title="@string/media" />
+
+        </group>
+    </item>
+
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="single">
+
         <item
-            android:id="@+id/chat_fragment_nav_members"
-            android:icon="@drawable/ic_group_black_24dp"
+            android:id="@+id/chat_fragment_nav_add_user"
+            android:icon="@drawable/ic_person_add_black_24dp"
             android:tint="@color/button_grey"
-            android:title="Members" />
-        <item
-            android:id="@+id/chat_fragment_nav_media"
-            android:icon="@drawable/ic_perm_media_black_24dp"
-            android:tint="@color/button_grey"
-            android:title="Media" />
+            android:title="@string/add_user" />
+
     </group>
+
+    <item
+        android:id="@+id/settings"
+        android:checkableBehavior="single"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:tint="@color/button_grey"
+        android:title="@string/action_settings" />
+
+    <item
+        android:id="@+id/chat_fragment_nav_leave_group"
+        android:icon="@drawable/ic_exit_black_24dp"
+        android:tint="@color/button_grey"
+        android:title="@string/leave_group" />
+
 
 </menu>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="school"
+            type="com.squareapps.a4teen.amigos.Common.POJOS.School" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="5">
+
+        <TextView
+            android:id="@+id/Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="@{school.institution_Name}"
+            android:textColor="#111"
+            android:textSize="18sp" />
+
+
+        <TextView
+            android:id="@+id/City"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="@{school.institution_City}"
+            android:textColor="#111"
+            android:textSize="18sp" />
+
+
+        <TextView
+            android:id="@+id/State"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="@{school.institution_State}"
+            android:textColor="#111"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/Web_Address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="@{school.institution_Web_Address}"
+            android:textColor="#111"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/Campus_Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="@{school.campus_Name}"
+            android:textColor="#111"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+</layout>

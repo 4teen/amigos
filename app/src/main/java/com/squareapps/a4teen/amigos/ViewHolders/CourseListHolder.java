@@ -1,56 +1,25 @@
 package com.squareapps.a4teen.amigos.ViewHolders;
 
-import android.app.Fragment;
-import android.content.Context;
-import android.content.Intent;
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
+import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.View;
-import android.widget.TextView;
 
-import com.squareapps.a4teen.amigos.Abstract.HolderBase;
-import com.squareapps.a4teen.amigos.Activities.CourseDetailActivity;
-import com.squareapps.a4teen.amigos.Common.Objects.Course;
 import com.squareapps.a4teen.amigos.R;
+import com.squareapps.a4teen.amigos.databinding.CourseListItemBinding;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+public class CourseListHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
-public class CourseListHolder extends HolderBase implements View.OnClickListener, View.OnCreateContextMenuListener {
+    private final CourseListItemBinding binding;
 
-    /**
-     * RecclerVIew.Adapter calls this class to create a viewHolder
-     */
-
-    @BindView(R.id.course_list_item_text1)
-    TextView mTitleTextView;
-    @BindView(R.id.course_list_item_text2)
-    TextView mSubtitleTextView;
-
-    private Course course;
-    private Callbacks callbacks;
-
-    public CourseListHolder(View itemView, Fragment fragment) {
+    public CourseListHolder(View itemView) {
         super(itemView);
-        callbacks = (Callbacks) fragment;
-        ButterKnife.bind(this, itemView);
-        itemView.setOnClickListener(this);
-        itemView.setOnCreateContextMenuListener(this);
+        this.binding = DataBindingUtil.bind(itemView);
     }
 
-
-    public void bind(Course course) {
-        this.course = course;
-        mTitleTextView.setText(course.getTitle());
-        mSubtitleTextView.setText(course.getCode() + "| " + course.getDepartment());
-    }
-
-    @Override
-    public void onClick(View view) {
-        callbacks.onItemSelected(getAdapterPosition(), itemView);
-        Context context = view.getContext();
-        Intent intent = new Intent(context, CourseDetailActivity.class);
-        intent.putExtra(CourseDetailActivity.COURSEID, course.getCode());
-        context.startActivity(intent);
+    public CourseListItemBinding getBinding() {
+        return binding;
     }
 
     @Override
@@ -59,11 +28,6 @@ public class CourseListHolder extends HolderBase implements View.OnClickListener
         menu.add(0, R.id.delete, getAdapterPosition(), "Delete Class");
 
     }
-
-    public interface Callbacks {
-        void onItemSelected(int pos, View itemView);
-    }
-
 
 
 }

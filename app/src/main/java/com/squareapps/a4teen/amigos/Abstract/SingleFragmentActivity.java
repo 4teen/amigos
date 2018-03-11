@@ -50,7 +50,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
                     .add(R.id.fragmentContainer, fragment)
                     .commit();
         }
-
     }
 
 }

@@ -1,71 +1,11 @@
 <resources>
-    <string name="app_name">Amigos</string>
+    <string name="app_name">Amigos-Beta</string>
     <!--<string name="gcm_defaultSenderId">630107011597</string> -->
     <string name="action_settings">Settings</string>
 
 
     <string name="search_title">Search</string>
 
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
-
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-
-    <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
-    </string-array>
-
-    <string-array name="pref_sync_frequency_values">
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>180</item>
-        <item>360</item>
-        <item>-1</item>
-    </string-array>
-
-    <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
-
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
 
     <string name="send">Send</string>
     <string name="title">Title</string>
@@ -79,7 +19,8 @@
     <string name="reset_form">Reset Form</string>
     <string name="group_name">Group Name</string>
     <string name="create_new_group">CREATE NEW GROUP</string>
-    <string name="title_activity_chat_members">Chat Members</string>
+    <string name="title_activity_chat_members">Members</string>
+    <string name="title_activity_create_group">New Group</string>
 
     <string name="desc_firebase_lockup">Firebase logo and name</string>
     <string name="start_phone_auth">Start</string>
@@ -113,8 +54,43 @@
     <string name="search_class">Search Class</string>
     <string name="my_profile">My Profile</string>
     <string name="title_activity_add_friends">Add Friends</string>
-    <string name="search_friend_by_e_mail">Search friends by e-mail</string>
+    <string name="search_by_e_mail">Search by e-mail</string>
     <string name="search_contact">Search Contacts</string>
     <string name="search_by_name">Search by name</string>
+    <string name="time_stamp">time stamp</string>
+    <string name="title_activity_notifications">Notifications</string>
+    <string name="change_avatar">Change Avatar</string>
+    <string name="change_name">Change Name</string>
+    <string name="add_members">Add Members</string>
+    <string name="members">Members</string>
+    <string name="media">Media</string>
+    <string name="leave_group">Leave Group</string>
+    <string name="add_user">Add user</string>
+
+    <string name="collapsed_image">A single Android robot waving. Symbolises a collapsed
+        notification.
+    </string>
+
+    <string name="search_match_other">Matches Other Field</string>
+    <string name="alphabet">ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <string name="ALGOLIA_APP_ID">L0P5DF8HKF</string>
+    <string name="ALGOLIA_SEARCH_API_KEY">18a73eca581cd261c8f3865c43829514</string>
+    <string name="ALGOLIA_INDEX_NAME">USA_UNIV</string>
+    <string name="updating_your_cellphone_will_delete_any_information_amigos_has_on_you_related_to_your_old_number_this_action_might_delete_every_contact_and_groups_youalready_have">Updating your cellphone will delete any information Amigos has on you related to your old number. This action might delete every contact, and groups youalready have.</string>
+    <string name="avatar_image_view">avatar image view</string>
+    <string name="key_group_name">GROUP_NAME</string>
+    <string name="group_settings_activity_title">Group Settings</string>
+    <string name="places">Places</string>
+    <string name="key_group_avatar">GROUP_AVATAR</string>
+    <string name="default_group_name">My clique</string>
+    <string name="key_allow_notifications">ALLOW_NOTIFICATIONS</string>
+    <string name="title_rigntone_settings">Rigntone</string>
+    <string name="key_general_group_settings">KEY_GENERAL_GROUP_SETTIGNS</string>
+    <string name="title_general_group_settings">General settings</string>
+    <string name="join">Join</string>
+    <string name="from">From</string>
+    <string name="leave_group_body_text">Leaving the group will not delete old messages you have sent. If you decide to re-join the group in the future, you will have to send a request to a current group member.</string>
+    <string name="leave_group_title">Leave group?</string>
+    <string name="group_invitations">Group Invitations</string>
 
 </resources>

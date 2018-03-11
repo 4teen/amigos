@@ -1,22 +1,23 @@
 package com.squareapps.a4teen.amigos.ViewHolders;
 
+import android.databinding.DataBindingUtil;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageView;
 
-import com.squareapps.a4teen.amigos.Abstract.HolderBase;
-import com.squareapps.a4teen.amigos.Common.Objects.Photo;
+import com.squareapps.a4teen.amigos.databinding.ImageViewObjectBinding;
 
-public class MediaHolder extends HolderBase {
+public class MediaHolder extends RecyclerView.ViewHolder {
 
+    private ImageViewObjectBinding binding;
 
     public MediaHolder(View itemView) {
         super(itemView);
+        binding = DataBindingUtil.bind(itemView);
     }
 
-    public void bind(Photo model) {
-        String photoUrl = model.getPhotoUrl();
-        setImageView(photoUrl, (ImageView) itemView);
 
+    public ImageViewObjectBinding getBinding() {
+        return binding;
     }
 
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        layout="@layout/progress_bar"
+        android:visibility="gone" />
+
+    <com.squareapps.a4teen.amigos.Fragments.EmptyRecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </com.squareapps.a4teen.amigos.Fragments.EmptyRecyclerView>
+
+    <TextView
+        android:layout_gravity="center"
+        style="@style/contactNameTitle"
+        android:id="@+id/emptyView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="empty view" />
+
+
+</LinearLayout>

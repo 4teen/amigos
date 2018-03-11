@@ -45,9 +45,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|bottom"
-          android:layout_margin="2dp"
+            android:layout_margin="@dimen/activity_horizontal_margin"
             android:tint="@color/white"
-            app:srcCompat="@android:drawable/btn_star"/>
+            app:srcCompat="@android:drawable/ic_search_category_default" />
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView

@@ -30,7 +30,7 @@
         <TextView
             android:id="@+id/detail"
             style="@style/ThemeOverlay.MyTextDetail"
-            android:text="Updating your cellphone will delete any information Amigos has on you related to your old number. This action might delete every contact, and groups youalready have." />
+            android:text="@string/updating_your_cellphone_will_delete_any_information_amigos_has_on_you_related_to_your_old_number_this_action_might_delete_every_contact_and_groups_youalready_have" />
 
     </LinearLayout>
 

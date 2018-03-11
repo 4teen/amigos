@@ -23,7 +23,6 @@
                 android:layout_height="?attr/actionBarSize"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
@@ -123,7 +122,7 @@
                 android:layout_marginBottom="24dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
-                android:text="@string/lb_search_bar_hint"
+                android:text="@string/search_title"
                 app:layout_constraintBottom_toTopOf="@+id/editText4"
                 app:layout_constraintLeft_toLeftOf="parent" />
 

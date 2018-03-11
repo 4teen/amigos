@@ -12,7 +12,7 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.Query;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
 import com.squareapps.a4teen.amigos.Activities.ChatMediaActivity;
-import com.squareapps.a4teen.amigos.Common.Objects.Photo;
+import com.squareapps.a4teen.amigos.Common.POJOS.Photo;
 import com.squareapps.a4teen.amigos.R;
 import com.squareapps.a4teen.amigos.ViewHolders.MediaHolder;
 
@@ -47,7 +47,7 @@ public class ChatMediaFragment extends FragmentBase {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_chat_members, container, false);
+        View view = inflater.inflate(R.layout.recycler_view_tool_bar, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
 
         Query dataRef = getDataRef().child(MEDIA).child(groupId);
@@ -61,7 +61,8 @@ public class ChatMediaFragment extends FragmentBase {
         myRecyclerAdapter = new FirebaseRecyclerAdapter<Photo, MediaHolder>(options) {
             @Override
             protected void onBindViewHolder(MediaHolder holder, int position, Photo model) {
-                holder.bind(model);
+                holder.getBinding().setPhoto(model);
+                holder.getBinding().executePendingBindings();
             }
 
             @Override

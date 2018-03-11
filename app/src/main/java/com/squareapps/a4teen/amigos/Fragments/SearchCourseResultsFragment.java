@@ -1,66 +1,96 @@
 package com.squareapps.a4teen.amigos.Fragments;
 
-import android.os.AsyncTask;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.google.firebase.database.DatabaseReference;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
-import com.squareapps.a4teen.amigos.Abstract.RecyclerAdapterSelector;
-import com.squareapps.a4teen.amigos.Common.CourseFetchr;
-import com.squareapps.a4teen.amigos.Common.Objects.Course;
+import com.squareapps.a4teen.amigos.Activities.CourseDetailActivity;
+import com.squareapps.a4teen.amigos.Common.POJOS.Course;
 import com.squareapps.a4teen.amigos.R;
-import com.squareapps.a4teen.amigos.ViewHolders.CourseHolder2;
+import com.squareapps.a4teen.amigos.Services.DowloadService;
+import com.squareapps.a4teen.amigos.ViewHolders.CourseListHolder;
 
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.squareapps.a4teen.amigos.Common.Contract.STUDENTS;
-import static java.io.File.separator;
+import static com.squareapps.a4teen.amigos.Common.Contract.Course.COURSE_CODE;
+import static com.squareapps.a4teen.amigos.Common.Contract.Course.CREDITS;
+import static com.squareapps.a4teen.amigos.Common.Contract.Course.NUMBER;
+import static com.squareapps.a4teen.amigos.Common.Contract.Course.PREFIX;
+import static com.squareapps.a4teen.amigos.Common.Contract.Course.TITLE;
+import static com.squareapps.a4teen.amigos.Common.Contract.OUTPUT;
 
 
-public class SearchCourseResultsFragment extends FragmentBase implements CourseHolder2.Callbacks {
-
-    public static final String COURSES = "courses";
-    public static final String USERS = "users";
+public class SearchCourseResultsFragment extends FragmentBase implements View.OnClickListener {
+    private final String TAG = getSimpleName(this);
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     private List<Course> courses;
-    private DatabaseReference databaseReference;
     private CourseAdapter courseAdapter;
-
+    private BroadcastReceiver mBroadcastReceiver;
 
     public static SearchCourseResultsFragment newInstance(List<Course> courseList) {
         SearchCourseResultsFragment fragment = new SearchCourseResultsFragment();
         fragment.setCourses(courseList);
         return fragment;
+    }
 
+    private void setCourses(List<Course> courses) {
+        this.courses = courses;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Register receiver for uploads and downloads
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getActivity());
+        manager.registerReceiver(mBroadcastReceiver, DowloadService.getIntentFilter());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Unregister download receiver
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        databaseReference = getDataRef();
+
         courseAdapter = new CourseAdapter(courses);
+
+        // Local broadcast receiver
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //    hideProgressDialog();
+
+                switch (intent.getAction()) {
+                    case DowloadService.DOWNLOAD_COMPLETED:
+                    case DowloadService.DOWNLOAD_ERROR:
+                        onDownloadResultIntent(intent);
+                        break;
+                }
+            }
+        };
 
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        courseAdapter.clearSelections();
     }
 
     @Override
@@ -79,57 +109,34 @@ public class SearchCourseResultsFragment extends FragmentBase implements CourseH
         }
     }
 
-    private void setCourses(List<Course> courses) {
-        this.courses = courses;
-    }
 
     @Override
-    public void onItemSelected(int pos, Course course, View itemView) {
-        courseAdapter.toggleSelection(pos);
-        boolean selected = courseAdapter.isSelected(pos);
-        itemView.setActivated(selected);
-        CourseHolder2 courseHolder2 = (CourseHolder2) mRecyclerView.findContainingViewHolder(itemView);
-        if (!itemView.isActivated() && courseAdapter.getSelectedItemCount() <= 0) {
-            courseHolder2.dismissActionBar();
-        }
-        if (itemView.isActivated() || courseAdapter.getSelectedItemCount() >= 1)
-            courseHolder2.startActionMode();
+    public void onClick(View v) {
+        int position = mRecyclerView.getChildAdapterPosition(v);
+        Course course = courseAdapter.getItem(position);
 
-
-    }
-
-    @Override
-    public void onAddItem(Course course) {
         getDataRef().updateChildren(course.courseSearchToMap());
-        String[] strings = {course.getPrefix(), course.getNumber(), "", "", SearchFormFragment.DETAIL};
-        new FetchItemsTask().execute(strings);
-        getActivity().finish();
+
+        Bundle bundle = new Bundle();
+        bundle.putString(COURSE_CODE, course.getCode());
+        bundle.putString(PREFIX, course.getPrefix());
+        bundle.putString(NUMBER, course.getNumber());
+        bundle.putString(CREDITS, "");
+        bundle.putString(TITLE, "");
+        bundle.putString(OUTPUT, SearchFormFragment.DETAIL);
+
+        DowloadService.startActionDownload(getContext(), bundle);
 
     }
 
-    @Override
-    public void onDestoryActionBar() {
-        if (courseAdapter.getItemCount() > 0)
-            for (Integer i : courseAdapter.getSelectedItems()) {
-                CourseHolder2 ch2 = (CourseHolder2) mRecyclerView.findViewHolderForAdapterPosition(i);
-                ch2.itemView.setActivated(false);
-            }
-        courseAdapter.clearSelections();
-
+    private void onDownloadResultIntent(Intent intent) {
+        Intent courseDetailIntent = new Intent(getContext(), CourseDetailActivity.class);
+        courseDetailIntent.setAction("Search");
+        courseDetailIntent.putExtras(intent.getExtras());
+        startActivity(courseDetailIntent);
     }
 
-    @Override
-    public void updateActionModeCounter(ActionMode mode, Menu menu) {
-        if (mode != null) {
-            MenuItem menuItem = menu.findItem(R.id.menu_counter);
-            menuItem.setActionView(R.layout.menu_counter);
-            TextView textView = menuItem.getActionView().findViewById(R.id.counter);
-            textView.setText(String.valueOf(courseAdapter.getSelectedItemCount()));
-
-        }
-    }
-
-    private class CourseAdapter extends RecyclerAdapterSelector<Course, CourseHolder2> {
+    private class CourseAdapter extends RecyclerView.Adapter<CourseListHolder> {
 
         private List<Course> mCourses;
 
@@ -138,45 +145,33 @@ public class SearchCourseResultsFragment extends FragmentBase implements CourseH
         }
 
         @Override
-        public CourseHolder2 onCreateViewHolder(ViewGroup parent, int viewType) {
+        public CourseListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = newItemView(parent, R.layout.course_list_item);
-            return new CourseHolder2(itemView, SearchCourseResultsFragment.this);
+            itemView.setOnClickListener(SearchCourseResultsFragment.this);
+            return new CourseListHolder(itemView);
         }
 
         @Override
-        public void onBindViewHolder(CourseHolder2 holder, int position) {
-            holder.itemView.setActivated(isSelected(position));
+        public void onBindViewHolder(CourseListHolder holder, int position) {
+            // holder.itemView.setActivated(isSelected(position));
             Course course = mCourses.get(position);
-            holder.bind(course);
+            holder.getBinding().setCourse(course);
+            holder.getBinding().executePendingBindings();
+            // holder.bind(course);
         }
 
         @Override
         public int getItemCount() {
             return mCourses.size();
         }
-    }
 
-    private class FetchItemsTask extends AsyncTask<String, Void, List<Course>> {
-        private String prefix, number;
-
-        @Override
-        protected List<Course> doInBackground(String... params) {
-            prefix = params[0];
-            number = params[1];
-            return new CourseFetchr().fetchCourses(params[0], params[1], params[2], params[3], params[4]);
+        public Course getItem(int position) {
+            return mCourses.get(position);
         }
 
-        @Override
-        protected void onPostExecute(List<Course> courses) {
-            for (Course c : courses) {
-                String courseCode = prefix + number;
-                HashMap<String, Object> map = c.courseDetailtoMap(courseCode);
-                map.put(USERS + separator + getUid() + separator + COURSES + separator + courseCode, true);
-                map.put(STUDENTS + separator + courseCode + separator + getUid(), true);
-                databaseReference.updateChildren(map);
-                courseAdapter.notifyDataSetChanged();
-            }
-        }
+
     }
 
 }
+
+

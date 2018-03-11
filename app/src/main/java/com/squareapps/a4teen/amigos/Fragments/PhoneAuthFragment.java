@@ -27,8 +27,8 @@ import com.squareapps.a4teen.amigos.R;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.firebase.ui.auth.ResultCodes.OK;
-import static com.squareapps.a4teen.amigos.Common.Contract.PHONE_NUMBER;
+import static android.app.Activity.RESULT_OK;
+import static com.squareapps.a4teen.amigos.Common.Contract.User.PHONE_NUMBER;
 
 
 public class PhoneAuthFragment extends FragmentBase implements View.OnClickListener {
@@ -62,6 +62,12 @@ public class PhoneAuthFragment extends FragmentBase implements View.OnClickListe
     private Button mVerifyButton;
     private Button mResendButton;
 
+    public static PhoneAuthFragment newInstance(Bundle b) {
+        PhoneAuthFragment fragment = new PhoneAuthFragment();
+        fragment.setArguments(b);
+        return fragment;
+    }
+    // [END on_start_check_user]
 
     // [START on_start_check_user]
     @Override
@@ -76,18 +82,11 @@ public class PhoneAuthFragment extends FragmentBase implements View.OnClickListe
         }
         // [END_EXCLUDE]
     }
-    // [END on_start_check_user]
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_VERIFY_IN_PROGRESS, mVerificationInProgress);
-    }
-
-    public static PhoneAuthFragment newInstance(Bundle b) {
-        PhoneAuthFragment fragment = new PhoneAuthFragment();
-        fragment.setArguments(b);
-        return fragment;
     }
 
     @Override
@@ -145,8 +144,7 @@ public class PhoneAuthFragment extends FragmentBase implements View.OnClickListe
                 // Update the UI and attempt sign in with the phone credential
                 updateUI(STATE_VERIFY_SUCCESS, credential);
                 // [END_EXCLUDE]
-                sendResult(mPhoneNumberField.getText().toString());
-                // signInWithPhoneAuthCredential(credential);
+
             }
 
             @Override
@@ -229,12 +227,11 @@ public class PhoneAuthFragment extends FragmentBase implements View.OnClickListe
     }
     // [END resend_verification]
 
-    private void sendResult(String data) {
+    private void sendResult(final String data) {
         Intent intent = new Intent();
         intent.putExtra(PHONE_NUMBER, data);
-        getActivity().setResult(OK, intent);
+        getActivity().setResult(RESULT_OK, intent);
         getActivity().finish();
-
     }
 
     // [START sign_in_with_phone]
@@ -301,9 +298,12 @@ public class PhoneAuthFragment extends FragmentBase implements View.OnClickListe
                 mDetailText.setText(R.string.status_verification_failed);
                 break;
             case STATE_VERIFY_SUCCESS:
+                final String phoneNumber = mPhoneNumberField.getText().toString();
+                Log.d("myPhoneNumber", phoneNumber);
                 // Verification has succeeded, proceed to firebase sign in
                 disableViews(mStartButton, mVerifyButton, mResendButton, mPhoneNumberField,
                         mVerificationField);
+
                 mDetailText.setText(R.string.status_verification_succeeded);
 
                 // Set the verification text based on the credential
@@ -314,6 +314,8 @@ public class PhoneAuthFragment extends FragmentBase implements View.OnClickListe
                         mVerificationField.setText(R.string.instant_validation);
                     }
                 }
+
+                sendResult(phoneNumber);
 
                 break;
             case STATE_SIGNIN_FAILED:
@@ -356,7 +358,6 @@ public class PhoneAuthFragment extends FragmentBase implements View.OnClickListe
                 if (!validatePhoneNumber()) {
                     return;
                 }
-
                 startPhoneNumberVerification(mPhoneNumberField.getText().toString());
                 break;
             case R.id.button_verify_phone:

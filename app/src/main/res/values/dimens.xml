@@ -7,6 +7,16 @@
     <dimen name="margin_1">8dp</dimen>
     <dimen name="margin_2">16dp</dimen>
 
-    <dimen name="appBar_height">192dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="padding">16dp</dimen>
+    <dimen name="listview_item_padding">16dp</dimen>
+
+    <!--     Navigation bar metrics
+     Width = Aspect ratio * Height
+     Height = Width/Aspect ratio
+     aspect ratio = 16:9-->
+    <dimen name="navdrawer_width">280dp</dimen> <!--this is 56 * 5 -->
+    <dimen name="navdrawer_height">158dp</dimen>
+
 </resources>

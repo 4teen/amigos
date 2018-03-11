@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_margin="@dimen/activity_horizontal_margin"
-    android:foreground="?attr/selectableItemBackground">
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.squareapps.a4teen.amigos.Fragments.SearchUsersFragment" />
+
+        <variable
+            name="course"
+            type="com.squareapps.a4teen.amigos.Common.POJOS.Course" />
+
+
+    </data>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/list_selector"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:background="@android:drawable/list_selector_background"
         android:orientation="vertical">
 
 
@@ -18,23 +29,24 @@
             android:id="@+id/course_list_item_text1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="@color/primary_text"
-            tools:text="@string/title" />
+            tools:text="@{course.title}" />
 
 
         <TextView
             android:id="@+id/course_list_item_text2"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="course subtitle"
+            android:layout_marginTop="16dp"
+            android:text="@{course.prefix + course.number + '|' + course.department}"
             android:textColor="@color/secondary_text"
             android:textSize="14sp" />
 
     </LinearLayout>
+</layout>
 
-</android.support.v7.widget.CardView>
+
 
 

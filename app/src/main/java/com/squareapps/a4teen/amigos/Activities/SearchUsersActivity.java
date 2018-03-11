@@ -5,10 +5,10 @@ import android.app.Fragment;
 import android.support.annotation.NonNull;
 
 import com.squareapps.a4teen.amigos.Abstract.SingleFragmentActivity;
-import com.squareapps.a4teen.amigos.Fragments.SearchContactsFragment;
 import com.squareapps.a4teen.amigos.Fragments.SearchUsersFragment;
+import com.squareapps.a4teen.amigos.Fragments.SearchUsersFragment2;
 
-import static com.squareapps.a4teen.amigos.Common.Contract.PHONE_NUMBER;
+import static com.squareapps.a4teen.amigos.Common.Contract.User.PHONE_NUMBER;
 
 
 public class SearchUsersActivity extends SingleFragmentActivity {
@@ -18,7 +18,7 @@ public class SearchUsersActivity extends SingleFragmentActivity {
     protected Fragment createFragment() {
         String searchBy = getIntent().getStringExtra(SearchUsersFragment.EXTRA_SEARCH_BY);
         if (searchBy.equals(PHONE_NUMBER))
-            return SearchContactsFragment.newInstance(getIntent().getExtras());
+            return SearchUsersFragment2.newInstance(getIntent().getExtras());
         else
             return SearchUsersFragment.newInstance(getIntent().getExtras());
     }

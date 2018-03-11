@@ -1,49 +1,49 @@
 package com.squareapps.a4teen.amigos.Fragments;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.database.Query;
 import com.squareapps.a4teen.amigos.Abstract.FragmentBase;
-import com.squareapps.a4teen.amigos.Activities.CollegePickerActivity;
-import com.squareapps.a4teen.amigos.Activities.ProfileActivity;
-import com.squareapps.a4teen.amigos.Common.Objects.School;
-import com.squareapps.a4teen.amigos.Common.QueryPreferences;
+import com.squareapps.a4teen.amigos.Common.POJOS.School;
 import com.squareapps.a4teen.amigos.R;
 import com.squareapps.a4teen.amigos.ViewHolders.SchoolHolder;
 
-import static com.firebase.ui.auth.ResultCodes.OK;
-import static com.squareapps.a4teen.amigos.Common.Contract.COLLEGE;
-import static com.squareapps.a4teen.amigos.Common.Contract.SCHOOLS;
+import java.util.ArrayList;
+import java.util.List;
 
+import static android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH;
+import static com.squareapps.a4teen.amigos.Common.Contract.Course.COLLEGE;
+import static com.squareapps.a4teen.amigos.Common.Contract.USERS;
 
-public class CollegePickerFragment extends FragmentBase implements SchoolHolder.Callback {
+/**
+ * Created by y-pol on 1/7/2018.s
+ */
 
-
-    private static final String TAG = "College picker fragment";
+public class CollegePickerFragment extends FragmentBase implements View.OnClickListener {
 
     private RecyclerView recyclerView;
+    private RecyclerView.Adapter<SchoolHolder> adapter;
+    private List<School> schoolList = new ArrayList<>();
+    private SearchView searchView;
     private Toolbar toolbar;
-    private FirebaseRecyclerAdapter<School, SchoolHolder> adapter;
-    private ProgressBar progressBar;
-
+   /* private Client client;
+    private Index index;
+    private Query query;*/
 
     public static CollegePickerFragment newInstance(Bundle bundle) {
 
@@ -52,135 +52,184 @@ public class CollegePickerFragment extends FragmentBase implements SchoolHolder.
         return fragment;
     }
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        handleIntent(getActivity().getIntent());
         setHasOptionsMenu(true);
-    }
 
+       /* client = new Client(getString(R.string.ALGOLIA_APP_ID), getString(R.string.ALGOLIA_SEARCH_API_KEY));
+        index = client.getIndex(getString(R.string.ALGOLIA_INDEX_NAME));
+
+        // Pre-build query.
+
+        query = new Query();
+
+        query.setAttributesToRetrieve("Campus_Address", "Campus_City", "Campus_State", "Campus_Zip",
+                "Institution_Address", "Institution_City", "Institution_Name", "Institution_Phone",
+                "Institution_State", "Institution_Web_Address", "Institution_Zip", "Campus_Name");
+
+        query.setAttributesToHighlight("Campus_City", "Institution_Name", "Institution_City", "Campus_Name");
+
+        query.setHitsPerPage(10);*/
+
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.recycler_view_tool_bar, container, false);
-
-        progressBar = view.findViewById(R.id.progress_bar);
-        recyclerView = view.findViewById(R.id.recycler_view);
         toolbar = view.findViewById(R.id.toolbar);
-
+        recyclerView = view.findViewById(R.id.recycler_view);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        // setToolbar(toolbar, R.drawable.ic_arrow_back_black_24dp);
 
         adapter = newAdapter();
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        search("");//initial query
+
+        RecyclerView.ItemDecoration itemDecoration = new
+                DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(itemDecoration);
+
         recyclerView.setAdapter(adapter);
 
         return view;
     }
 
-
-    private FirebaseRecyclerAdapter<School, SchoolHolder> newAdapter() {
-        String query = QueryPreferences.getPrefSearchQuery(getContext());
-        if (query == null) {
-            return null;
-        } else {
-            progressBar.setVisibility(View.VISIBLE);
-
-            Query dataRef = getDataRef().child(SCHOOLS).orderByChild("Institution_Name")
-                    .startAt(query)
-                    .endAt(query + "\uf8ff")
-                    .limitToFirst(10);
-
-            FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<School>()
-                    .setQuery(dataRef, School.class)
-                    .setLifecycleOwner(((CollegePickerActivity) getActivity()))
-                    .build();
-
-
-            adapter = new FirebaseRecyclerAdapter<School, SchoolHolder>(options) {
-                @Override
-                protected void onBindViewHolder(SchoolHolder holder, int position, School model) {
-                    holder.bind(model);
-                }
-
-                @Override
-                public SchoolHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                    View itemView = newItemView(parent, R.layout.course_list_item);
-                    return new SchoolHolder(itemView, CollegePickerFragment.this);
-                }
-
-                @Override
-                public void onDataChanged() {
-                    if (progressBar != null && progressBar.isShown())
-                        progressBar.setVisibility(View.GONE);
-                }
-            };
-
-            return adapter;
-
-        }
-    }
-
-
-    @Override
-    public void onItemClicked(View itemView, int pos) {
-        TextView schoolName = itemView.findViewById(R.id.course_list_item_text1);
-        Intent intent = new Intent(getActivity(), ProfileActivity.class);
-        intent.putExtra(COLLEGE, schoolName.getText());
-        getActivity().setResult(OK, intent);
-        getActivity().finish();
-
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.search_menu, menu);
+        inflater.inflate(R.menu.menu_college_picker, menu);
+        // Configure search view.
 
-        SearchView searchView = (SearchView) menu.findItem(R.id.menu_item_search).getActionView();
-        searchView.setIconified(false);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+
+        final MenuItem itemSearch = menu.findItem(R.id.action_search);
+        searchView = (SearchView) itemSearch.getActionView();
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+
+        searchView.setImeOptions(IME_ACTION_SEARCH);
 
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                Log.d(TAG, "QuerryTextSubmit: " + query);
-                QueryPreferences.setPrefSearchQuery(getContext(), query);
-                updateSearch();
+            public boolean onQueryTextSubmit(String s) {
+                searchView.clearFocus();
                 return true;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                Log.d(TAG, "QuerryTextChanged: " + newText);
-                if (!newText.isEmpty()) {
-                    QueryPreferences.setPrefSearchQuery(getContext(), newText);
-                    updateSearch();
-                    return true;
-                }
-                return false;
+            public boolean onQueryTextChange(String s) {
+                search(s);
+                return true;
             }
         });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_clear:
-                QueryPreferences.setPrefSearchQuery(getContext(), null);
-                updateSearch();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+    public RecyclerView.Adapter<SchoolHolder> newAdapter() {
+
+        return new RecyclerView.Adapter<SchoolHolder>() {
+            @Override
+            public SchoolHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = newItemView(parent, R.layout.school_list_item);
+                view.setOnClickListener(CollegePickerFragment.this);
+                return new SchoolHolder(view);
+            }
+
+            @Override
+            public void onBindViewHolder(SchoolHolder holder, int position) {
+                School school = schoolList.get(position);
+                holder.getBinding().setSchool(school);
+                holder.getBinding().executePendingBindings();
+            }
+
+            @Override
+            public int getItemCount() {
+                return schoolList.size();
+            }
+        };
+
 
     }
 
-    public void updateSearch() {
-        adapter = newAdapter();
-        recyclerView.swapAdapter(adapter, true);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private void search(String mquery) {
+
+     /*   query.setQuery(mquery);
+        Log.d("search Query", mquery);
+
+        index.searchAsync(query, new CompletionHandler() {
+
+            @Override
+
+            public void requestCompleted(JSONObject content, AlgoliaException error) {
+
+                if (content != null && error == null) {
+                    JSONArray jsonArray = new JSONArray();
+
+                    try {
+                        jsonArray = content.getJSONArray("hits");
+
+                    } catch (JSONException je) {
+                        Log.d("Json Execption", je.getMessage());
+                    }
+
+
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+
+                    Gson gson = gsonBuilder.create();
+
+                    Type SchoolListType = new TypeToken<List<School>>() {
+                    }.getType();
+
+                    Log.d("results", content.toString());
+
+                    schoolList = gson.fromJson(jsonArray.toString(), SchoolListType);
+
+                    if (adapter != null)
+                        adapter.notifyDataSetChanged();
+
+                    // Scroll the list back to the top.
+
+                    recyclerView.smoothScrollToPosition(0);
+
+                }
+
+            }
+
+        });
+*/
+    }
+
+    public void handleIntent(Intent intent) {
+    /*    if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            Log.d("new Search", "processing" + query);
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            search(query);
+        }*/
+    }
+
+    @Override
+    public void onClick(View view) {
+        School school = schoolList.get(recyclerView.getChildAdapterPosition(view));
+        getDataRef().child(USERS)
+                .child(getUid())
+                .child(COLLEGE)
+                .setValue(school);
+        getActivity().finish();
+
+        /*TextView view1 = new TextView(getActivity());
+        view1.setBackground(getResources().getDrawable(R.drawable.red_circle));
+        view1.setText(school.getInstitution_Name());
+        searchView.addView(view1);
+        searchView.*/
 
     }
 }

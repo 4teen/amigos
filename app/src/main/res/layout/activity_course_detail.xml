@@ -1,127 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="course"
+            type="com.squareapps.a4teen.amigos.Common.POJOS.Course" />
+
+
+    </data>
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="192dp"
+            android:minHeight="?actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolBar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize" />
+                android:layout_height="match_parent"
+                android:theme="@style/ThemeOverlay.AppCompat.Light"
+                app:ExpandedTitleColor="@{@color/white}"
+                app:collapsedTitleTextColor="@{@color/white}"
+                app:contentScrim="@color/primary_dark"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:title="@{`department of `+course.department}">
 
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+            </android.support.design.widget.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
+
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/nestedView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
+
+            <TableLayout
+                android:id="@+id/table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:layout_marginStart="24dp"
+                android:divider="?attr/dividerHorizontal"
+                android:showDividers="middle"
+                android:shrinkColumns="1"
+                app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
+
+                <TextView
+                    android:id="@+id/textView0"
+                    style="@style/TextAppearance.AppCompat.Large"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:text="@{course.title}" />
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/textView1"
+                        style="@style/AppTheme.TableRow.Left"
+                        android:text="@string/description" />
+
+                    <TextView
+                        android:id="@+id/detail_description"
+                        style="@style/AppTheme.TableRow.Right"
+                        android:text="@{course.description}" />
+
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        style="@style/AppTheme.TableRow.Left"
+                        android:text="@string/credit_hours" />
+
+                    <TextView
+                        android:id="@+id/detail_credits"
+                        style="@style/AppTheme.TableRow.Right"
+                        android:text="@{course.creditHours}" />
+
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        style="@style/AppTheme.TableRow.Left"
+                        android:text="@string/prerequisites" />
+
+                    <TextView
+                        android:id="@+id/detail_prerequisites"
+                        style="@style/AppTheme.TableRow.Right"
+                        android:text="@{course.prerequisites}" />
+
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/textView4"
+                        style="@style/AppTheme.TableRow.Left"
+                        android:text="@string/corequisites" />
+
+                    <TextView
+                        android:id="@+id/detail_corequisites"
+                        style="@style/AppTheme.TableRow.Right"
+                        android:text="@{course.corequisites}" />
+
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/textView5"
+                        style="@style/AppTheme.TableRow.Left"
+                        android:text="@string/co_prerequisites" />
+
+                    <TextView
+                        android:id="@+id/detail_co_prerequsites"
+                        style="@style/AppTheme.TableRow.Right"
+                        android:text="@{course.coPrerequisites}" />
+
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/textView6"
+                        style="@style/AppTheme.TableRow.Left"
+                        android:text="@string/course_requirements" />
+
+                    <TextView
+                        android:id="@+id/detail_requirements"
+                        style="@style/AppTheme.TableRow.Right"
+                        android:text="@{course.courseRequirements}" />
+
+                </TableRow>
+            </TableLayout>
+        </android.support.v4.widget.NestedScrollView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_1"
+            app:backgroundDrawable="@{course.action==null ? @drawable/ic_group_black_24dp : @drawable/ic_add_black_24dp}"
+            app:fabSize="normal"
+            app:layout_anchor="@id/table"
+            app:layout_anchorGravity="bottom|right" />
     </android.support.design.widget.CoordinatorLayout>
 
-
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:divider="?attr/dividerHorizontal"
-        android:showDividers="middle"
-        android:shrinkColumns="1">
-
-        <TextView
-            android:id="@+id/textView0"
-            style="@style/TextAppearance.AppCompat.Large"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:text="@string/title" />
-
-        <TableRow>
-
-            <TextView
-                android:id="@+id/textView1"
-                style="@style/AppTheme.TableRow.Left"
-                android:text="@string/description" />
-
-            <TextView
-                android:id="@+id/detail_description"
-                style="@style/AppTheme.TableRow.Right" />
-
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                android:id="@+id/textView2"
-                style="@style/AppTheme.TableRow.Left"
-                android:text="@string/credit_hours" />
-
-            <TextView
-                android:id="@+id/detail_credits"
-                style="@style/AppTheme.TableRow.Right" />
-
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                android:id="@+id/textView3"
-                style="@style/AppTheme.TableRow.Left"
-                android:text="@string/prerequisites" />
-
-            <TextView
-                android:id="@+id/detail_prerequisites"
-                style="@style/AppTheme.TableRow.Right" />
-
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                android:id="@+id/textView4"
-                style="@style/AppTheme.TableRow.Left"
-                android:text="@string/corequisites" />
-
-            <TextView
-                android:id="@+id/detail_corequisites"
-                style="@style/AppTheme.TableRow.Right" />
-
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                android:id="@+id/textView5"
-                style="@style/AppTheme.TableRow.Left"
-                android:text="@string/co_prerequisites" />
-
-            <TextView
-                android:id="@+id/detail_co_prerequsites"
-                style="@style/AppTheme.TableRow.Right" />
-
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                android:id="@+id/textView6"
-                style="@style/AppTheme.TableRow.Left"
-                android:text="@string/course_requirements" />
-
-            <TextView
-                android:id="@+id/detail_requirements"
-                style="@style/AppTheme.TableRow.Right" />
-
-        </TableRow>
-    </TableLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_margin="@dimen/margin_1"
-        android:src="@drawable/ic_group_black_24dp" />
-</LinearLayout>
+</layout>

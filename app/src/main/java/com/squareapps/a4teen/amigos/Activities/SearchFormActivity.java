@@ -1,12 +1,10 @@
 package com.squareapps.a4teen.amigos.Activities;
 
 
-import android.app.FragmentManager;
 import android.support.annotation.NonNull;
 
-
 import com.squareapps.a4teen.amigos.Abstract.SingleFragmentActivity;
-import com.squareapps.a4teen.amigos.Common.Objects.Course;
+import com.squareapps.a4teen.amigos.Common.POJOS.Course;
 import com.squareapps.a4teen.amigos.Fragments.SearchCourseResultsFragment;
 import com.squareapps.a4teen.amigos.Fragments.SearchFormFragment;
 import com.squareapps.a4teen.amigos.R;
@@ -27,8 +25,10 @@ public class SearchFormActivity extends SingleFragmentActivity implements Search
 
     @Override
     public void onSubmitQuery(List<Course> courses) {
-        FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().replace(R.id.fragmentContainer, SearchCourseResultsFragment.newInstance(courses)).commit();
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, SearchCourseResultsFragment.newInstance(courses))
+                .commit();
     }
 
 }
